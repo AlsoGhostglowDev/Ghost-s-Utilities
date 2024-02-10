@@ -4,7 +4,7 @@ GhostUtil (aka. Ghost's Utilities) is a library for Psych Engine with the object
 
 ## 2.0 Contributors:
 *These are the people who contributed to GhostUtil atleast once*
-* [GhostglowDev](https://github.com/GhostglowDev)
+* [GhostglowDev](https://github.com/AlsoGhostglowDev)
 * [T-Bar](https://github.com/TBar09)
 * [galactic_2005](https://github.com/galactic2005)
 * [Meloomazy / Laztrix](https://github.com/Meloomazy)
