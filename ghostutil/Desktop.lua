@@ -1,4 +1,4 @@
----@meta Dekstop
+---@meta dekstop
 ---@author T-Bar
 ---@package ghostutil
 
@@ -11,7 +11,7 @@
 local desktop = {};
 
 local nircmdPath = 'ghostutil/nircmd/'
-local d = require "ghostutil.Debug"
+local d = require "ghostutil.debug"
 
 ---Runs a command prompt code
 ---@param codeToRun string The cmd code to run

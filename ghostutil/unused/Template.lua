@@ -1,10 +1,10 @@
----@meta Template
+---@meta template
 ---@author GhostglowDev
 
 ---@class Template
 local temp = {}
 
 temp.var = ""
-temp.func = function() end
+function temp.func() end
 
 return temp

@@ -1,4 +1,4 @@
----@meta File
+---@meta file
 ---@author GhostglowDev
 
 ---@class File
@@ -10,7 +10,7 @@ local file = {}
 ---@param usingModFolder? boolean If the file is in the mod folder.
 ---@return string
 ---@nodiscard
-file.getFileContent = function(f, root, usingModFolder) 
+function file.getFileContent(f, root, usingModFolder) 
     usingModFolder = usingModFolder or false
     root = (root == "./" and "" or (root == nil and (usingModFolder and "mods/"..(currentModDirectory:gsub("/", ""))..root or "assets/"..root) or (usingModFolder and "mods/"..(currentModDirectory:gsub("/", "")).."/" or "assets/")))
 
@@ -25,7 +25,7 @@ end
 ---Gets the absolute directory for the current file
 ---@return string
 ---@nodiscard
-file.getCurrentDirectory = function()
+function file.getCurrentDirectory()
     return io.popen("cd"):read('*all')
 end
 

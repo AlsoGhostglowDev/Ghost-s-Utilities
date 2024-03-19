@@ -1,13 +1,13 @@
----@meta Media
+---@meta media
 ---@author T-Bar
 
 ---@class Media
 local media = {};
 
-local d = require "ghostutil.Debug"
-local o = require "ghostutil.OutdateHandler"
+local d = require "ghostutil.debug"
+local o = require "ghostutil.outdate-handler"
 
-function _gcall(func)
+function __media_gcall(func, _)
 	if func ~= "createpost" then return end 
 	local libs = {
 		{'MP4Handler', 'vlc'},
@@ -29,7 +29,7 @@ end
 ---@param tag? string The tag of the video, can be used to locate it easily
 ---@param videoPath string The path of the video, should be in the "videos" folder
 ---@param skippable boolean Is the video skippable?
-media.playVideo = function(tag, videoPath, skippable)
+function media.playVideo(tag, videoPath, skippable)
 	if runHaxeCode([[return FileSystem.exists(Paths.video("]] ..tostring(videoPath).. [["));]]) == nil then
 		d.error("media.playVideo:1: the video 'videoPath' does not exist!")
 	else
@@ -55,7 +55,7 @@ end
 ---@param tag string The tag of the video that you want to change values on
 ---@param var string The value you want to change
 ---@param val string The new value
-media.setVideoProperty = function(tag, var, val)
+function media.setVideoProperty(tag, var, val)
 	if tag == nil then
 		d.error("media.setVideoProperty:1: The video with a tag of " ..tag.. " doesn't exist!")
 	else
@@ -66,7 +66,7 @@ end
 ---Sets the volume of a video
 ---@param tag string The tag of the video that you want to change values on
 ---@param vol number The new volume
-media.setVideoVolume = function(tag, vol)
+function media.setVideoVolume(tag, vol)
 	if tag == nil then
 		d.error("media.setVideoVolume:1: The video with a tag of " ..tag.. " doesn't exist!")
 	else
@@ -76,7 +76,7 @@ end
 
 ---Pauses a video
 ---@param tag string The tag of the video that you want to pause
-media.pauseVideo = function(tag)
+function media.pauseVideo(tag)
 	if tag == nil then
 		d.error("media.pauseVideo:1: The video with a tag of " ..tag.. " doesn't exist!")
 	else
@@ -86,7 +86,7 @@ end
 
 ---Resumes a video
 ---@param tag string The tag of the video that you want to resume
-media.resumeVideo = function(tag)
+function media.resumeVideo(tag)
 	if tag == nil then
 		d.error("media.resumeVideo:1: The video with a tag of " ..tag.. " doesn't exist!")
 	else
@@ -99,7 +99,7 @@ end
 ---@param soundURL string The url of the mp3
 ---@param looped? boolean Should the sound loop?
 ---@param AutoDestroy? boolean Should the sound auto destroy when finished?
-media.playStreamSound = function(tag, soundURL, looped, AutoDestroy)
+function media.playStreamSound(tag, soundURL, looped, AutoDestroy)
 	runHaxeCode(
 		(version >= "0.7.0" and "game" or "PlayState.instance")..[[.modchartSounds.set(']] ..tostring(tag).. [[', new FlxSound());
 		]]..(version >= "0.7.0" and "game" or "PlayState.instance")..[[.modchartSounds[']]..tag..[['].loadStream("]] ..tostring(soundURL).. [[", ]] ..tostring((looped or 'false')).. [[, ]] ..tostring((AutoDestroy or 'false')).. [[, function(){ game.callOnLuas("onSoundFinished", ["]]..(tag)..[["]); }, function(){ game.callOnLuas("onSoundLoaded", ["]]..(tag)..[["]); });
@@ -109,7 +109,7 @@ end
 ---Plays a Media.lua made sound
 ---@param tag string The tag of the sound you want to play
 ---@param forceRestart boolean Should the sound force restart?
-media.playSound = function(tag, forceRestart)
+function media.playSound(tag, forceRestart)
 	runHaxeCode(
 		(version >= "0.7.0" and "game" or "PlayState.instance")..[[.modchartSounds.set(']] ..tostring(tag).. [[', new FlxSound());
 		]]..(version >= "0.7.0" and "game" or "PlayState.instance")..[[.modchartSounds[']]..tag..[['].play(]] ..tostring((forceRestart or 'false')).. [[);
@@ -123,7 +123,7 @@ end
 ---@param object string The object the x,y position focuses on (only detects lua made objects for now)
 ---@param radius number The maximum distance the sound can go before its completely silent
 ---@param pan? boolean Whether panning should be used in addition to the volume changes
-media.setSoundProximity = function(tag, xPos, yPos, object, radius, pan)
+function media.setSoundProximity(tag, xPos, yPos, object, radius, pan)
 	if tag ~= nil then
 		runHaxeCode(
 			(version >= "0.7.0" and "game" or "PlayState.instance")..[[.modchartSounds.set(']] ..tostring(tag).. [[', new FlxSound());
@@ -139,7 +139,7 @@ end
 ---@param startTime? number The start point of the sound (in milliseconds)
 ---@param endTime number The end point of the sound (in milliseconds)
 ---@param forceRestart? boolean Should the sound force restart?
-media.playSoundWithPoints = function(tag, startTime, endTime, forceRestart)
+function media.playSoundWithPoints(tag, startTime, endTime, forceRestart)
 	runHaxeCode(
 		(version >= "0.7.0" and "game" or "PlayState.instance")..[[.modchartSounds.set(']] ..tostring(tag).. [[', new FlxSound());
 		]]..(version >= "0.7.0" and "game" or "PlayState.instance")..[[.modchartSounds[']]..tag..[['].play(]] ..tostring((forceRestart or 'false')).. [[, ]] ..tostring((startTime or '0')).. [[, ]] ..tostring(endTime).. [[);
@@ -148,7 +148,7 @@ end
 
 ---Gets the sound volume of the specified sound
 ---@param tag string The tag of the sound you want to get the volume
-media.getSoundVolume = function(tag)
+function media.getSoundVolume(tag)
 	runHaxeCode([[
 		if (]]..(version >= "0.7.0" and "game" or "PlayState.instance")..[[.modchartSounds[']]..tag..[['] != null)
 			return ]]..(version >= "0.7.0" and "game" or "PlayState.instance")..[[.modchartSounds[']]..tag..[['].getActualVolume();
@@ -158,7 +158,7 @@ end
 ---Sets the sound's position. (Might need to use media.setSoundProximity)
 ---@param tag string The tag of the sound you want to set position
 ---@param xPos number The new position of the sound
-media.setSoundPosition = function(tag, pos)
+function media.setSoundPosition(tag, pos)
 	if tag ~= nil then
 		runHaxeCode([[
 			if (]]..(version >= "0.7.0" and "game" or "PlayState.instance")..[[.modchartSounds[']]..tag..[['] != null)

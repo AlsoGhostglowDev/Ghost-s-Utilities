@@ -1,4 +1,4 @@
----@meta Web
+---@meta web
 ---@author T-Bar, GhostglowDev
 
 ---@class Web
@@ -7,22 +7,22 @@ local web = {}
 ---Gets the data from a website
 ---@param website string
 ---@return string
-web.getDataFromWebsite = function(website)
+function web.getDataFromWebsite(website)
     if website ~= nil then
         addHaxeLibrary("Http", "sys")
         
         runHaxeCode([[
-            game.variables["websiteData"] = '';
+            setVar("websiteData", '');
             var http = new Http("]]..website..[[");
             http.onData = function (data:String) {
-                game.variables["websiteData"] = data;
+                setVar("websiteData", data);
             }
             http.onError = function (error:String) {
-                data = ['', ''];
+                setVar("websiteData", ['', '']);
             }
             http.request();
         ]])
-        return runHaxeCode("return game.variables['websiteData'];")
+        return runHaxeCode("return getVar('websiteData')")
     else
         -- Debug uses this class so can't require it
         runHaxeCode([[game.addTextToDebug('web.getDataFromWebsite:1: The argument "website" is not defined!', 0xFFFF0000);]])
@@ -33,7 +33,7 @@ end
 
 ---Loads a link from the argument 
 ---@param website string
-web.browserLoad = function(website)
+function web.browserLoad(website)
     addHaxeLibrary("CoolUtil", version >= "0.7.0" and "backend" or "")
     if website ~= nil then
 		return runHaxeCode([[CoolUtil.browserLoad("]]..website..[[");]])
