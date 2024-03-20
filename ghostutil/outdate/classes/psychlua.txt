@@ -1,0 +1,12 @@
+CallbackHandler-FunkinLua
+CustomSubstate-FunkinLua
+DebugLuaText-FunkinLua
+ExtraFunctions-FunkinLua
+FunkinLua
+HScript-FunkinLua
+LuaUtils-FunkinLua
+ModchartAnimateSprite-FunkinLua
+ModchartSprite-FunkinLua
+ReflectionFunctions-FunkinLua
+ShaderFunctions-FunkinLua
+TextFunctions-FunkinLua
