@@ -1,4 +1,0 @@
-BlendModeEffect
-ColorSwap
-OverlayShader
-WiggleEffect
