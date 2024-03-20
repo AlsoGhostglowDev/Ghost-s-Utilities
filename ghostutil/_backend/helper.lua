@@ -1,5 +1,5 @@
 local helper = {}
-local debug = require 'ghostutil.Debug'
+local debug = require 'ghostutil.debug'
 
 function helper.getCameraFromString(cam)
     if cam:lower() == "hud" or cam:lower() == "camhud" then return "camHUD"
