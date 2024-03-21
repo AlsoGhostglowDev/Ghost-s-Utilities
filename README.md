@@ -35,7 +35,7 @@ GhostUtil (aka. Ghost's Utilities) is a library for Psych Engine with the object
 * Now you can mess around in the GhostUtil environment!
 ```lua
 local math = require "ghostutil.lua-addons.math"
-local game = require "ghostutil.Game"
+local game = require "ghostutil.game"
 
 function onCreate()
     luaDebugMode = true
