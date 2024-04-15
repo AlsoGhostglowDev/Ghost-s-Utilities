@@ -30,7 +30,12 @@ GhostUtil (aka. Ghost's Utilities) is a library for Psych Engine with the object
 
 * To use GhostUtil, you must import it's modules; you must use the `require` function.
                    
-![image](https://github.com/GhostglowDev/Ghost-s-Utilities/assets/108509756/d2114b55-ad69-484d-bb8b-6135d544d671)
+```lua
+local string = require 'ghostutil.lua-addons.string'
+local math = require 'ghostutil.lua-addons.math'
+local game = require 'ghostutil.game'
+local outdate = require 'ghostutil.outdate-handler' 
+```
 
 * Now you can mess around in the GhostUtil environment!
 ```lua
