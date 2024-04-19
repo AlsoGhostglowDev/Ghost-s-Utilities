@@ -130,14 +130,14 @@ function game.setCamFilters(camera, filters, shaderVals)
 
         ]]
     local filterVars, itime = "", ""
-    local main = "game.".. getCameraFromString(camera) .. (version >= '0.7.2' and ".filters = [" or '.setFilters([')
+    local main = "game.".. getCameraFromString(camera) .. (version >= '0.7.2' and ".filters = [" or '._filters = [')
     for i, filter in ipairs(filters) do
         initLuaShader(filter)
         filterVars = filterVars .. "var shader".. i .." = game.createRuntimeShader('".. filter .."');" .. m
         main = main .. "new ShaderFilter(shader".. i ..")" .. (i == #filters and "" or ",")
         itime = itime .. 'shader'.. i ..'.setFloat("iTime", Timer.stamp());' .. m .. "    "
     end
-    main = main .. (version >= '0.7.2' and "];" or ']); ')
+    main = main .. ("];")
 
     local shaderV = ''
     for s, shader in ipairs(shaderVals) do
