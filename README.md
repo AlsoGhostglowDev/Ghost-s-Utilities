@@ -53,7 +53,7 @@ end
 ```
 
 ### For more advanced information:
-**CHECK OUT THE [WIKI](https://github.com/GhostglowDev/Ghost-s-Utilities/wiki) FOR MORE FUNCTIONS.**
+**CHECK OUT THE [WIKI](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki) FOR MORE FUNCTIONS.**
 
 ### Older Versions
 **Psych Engine**:
