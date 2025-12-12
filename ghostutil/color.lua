@@ -1,80 +1,103 @@
----@meta color
----@author GhostglowDev
-
----@class Color
 local color = {}
+local debug = require 'ghostutil.debug'
+local helper = require 'ghostutil.backend.helper'
 
-local d = require "ghostutil.debug"
+color.TRANSPARENT = 0x000000
+color.WHITE = 0xFFFFFF
+color.GRAY = 0x808080
+color.BLACK = 0x000000
 
-local _h = require "ghostutil._backend.helper"
+color.RED = 0xFF0000
+color.BLUE = 0x0000FF
+color.GREEN = 0x008000
+color.PINK = 0xFFC0CB
+color.MAGENTA = 0xFF00FF
+color.PURPLE = 0x800080
+color.LIME = 0x00FF00
+color.YELLOW = 0xFFFF00
+color.ORANGE = 0xFFA500
+color.CYAN = 0x00FFFF
 
-color.WHITE = "0xFFFFFFFF"
-color.GRAY = "0xFF808080"
-color.BLACK = "0xFF000000"
-
-color.RED = "0xFFFF0000"
-color.BLUE = "0xFF0000FF"
-color.GREEN = "0xFF008000"
-color.PINK = "0xFFFFC0CB"
-color.MAGENTA = "0xFFFF00FF"
-color.PURPLE = "0xFF800080"
-color.LIME = "0xFF00FF00"
-color.YELLOW = '0xFFFFFF00'
-color.ORANGE = "0xFFFFA500"
-color.CYAN = "0xFF00FFFF"
-
----Sets an object color to the target value
----@param spr string Object
----@param val string The target color. (RRGGBB)
-function color.setSpriteColor(spr, val)
-    if spr ~= nil or spr ~= '' then setProperty(spr..".color", getColorFromHex (val or "FFFFFF")) else
-        d.error("color.setSpriteColor:1: Expected a value")
-    end
+function color.getHexString(int, digits)
+    return helper.callMethodFromClass('StringTools', 'hex', {int, digits})
 end
 
----Sets an object's color transform to the target values
----@param spr string Object
----@param multipliers table<number> Values: {redMult, blueMult, greenMult, alphaMult}
----@param offsets table<number> Values: {redOffset, blueOffset, greenOffset, alphaOffset}
-function color.setSpriteColorTransform(spr, multipliers, offsets)
-    local isLuaSprite = luaSpriteExists(spr)
-    local isVar = _h.variableExists(spr)
-
-    if spr ~= nil then runHaxeCode("game."..(isLuaSprite and "getLuaObject("..spr..")" or (isVar and 'getVar("'.. spr ..'")' or spr))..".setColorTransform("..(multipliers[1] or 0)..", "..(multipliers[2] or 0)..", "..(multipliers[3] or 0)..", "..(multipliers[4] or 0)..", "..(offsets[1] or 0)..", "..(offsets[2] or 0)..", "..(offsets[3] or 0)..", "..(offsets[4] or 0)..");") else
-        d.error("color.setSpriteColorTransform:1: Expected a value")
+function color.rgbToHex(rgb)
+    for i, channel in ipairs(rgb) do
+        if channel == nil then
+            debug.warn('nil_param', {'rgb, defaulted to 0'}, 'color.rgbToHex:1:'.. i)
+            rgb[i] = helper.resolveDefaultValue(channel, 0)
+        elseif channel < 0 then
+            rgb[i] = math.abs(rgb)
+        end
     end
 
-    for i = 1, 4 do
-        if multipliers[i] == nil then d.warning("color.setSpriteColorTransform:2["..i.."]: Given an empty value, nil -> 0") end
-        if offsets[i] == nil then d.warning("color.setSpriteColorTransform:3["..i.."]: Given an empty value, nil -> 0") end
-    end
+    return tonumber('0x'.. string.format('%02X%02X%02X', unpack(rgb)))
 end
 
----Returns an object color
----@param spr string
----@return string 
----@nodiscard
-function color.getSpriteColor(spr)
-    if spr ~= nil then 
-        return getProperty(spr..".color") 
+function color.argbToRGB(argb) 
+    if color.usingARGB(argb) then
+        return bit.band(argb, 0xFFFFFF)
     end
-    
-    d.error("color.getSpriteColor:1: Expected a value")
-    return ""
+    return argb
 end
 
----Converts RGB to the Hex format (RRGGBB).
----@param r integer
----@param g integer
----@param b integer
----@return string
----@nodiscard
-function color.rgbToHex(r, g, b)
-    if r == nil or g == nil or b == nil then
-        d.warning("color.rgbToHex: Given an empty value. nil -> 255")
+function color.rgbToARGB(rgb, alpha)
+    if color.usingRGB(rgb) then
+        alpha = alpha or 1
+        return bit.bor(bit.lshift(alpha * 255, 24), rgb)
     end
-    
-    return string.format("%02X%02X%02X", (r or 255), (g or 255), (b or 255))
+    return rgb
+end
+
+function color.usingARGB(int)
+    return #color.getHexString(int) > 6
+end
+
+function color.usingRGB(int)
+    return not color.usingARGB(int)
+end
+
+function color.extractChannels(int)
+    local alpha = color.usingARGB(int) and bit.band(bit.rshift(int, 24), 0xFF) or 0
+    return {
+        alpha = alpha,
+        red = bit.band(bit.rshift(int, 16),  0xFF),
+        green = bit.band(bit.rshift(int, 8), 0xFF),
+        blue = bit.band(int, 0xFF)
+    }
+end
+
+function color.getAlpha(int)
+    return color.extractChannels(int).alpha
+end
+
+function color.getRed(int)
+    return color.extractChannels(int).red
+end
+
+function color.getBlue(int)
+    return color.extractChannels(int).blue
+end
+
+function color.getGreen(int)
+    return color.extractChannels(int).green
+end
+
+function color.setColor(tag, color)
+    setProperty(tag ..'.color', color.argbToRGB(color))
+end
+
+function color.setColorTransform(tag, mult, offset)
+    if tag ~= nil then
+        mult = helper.resizeTable(helper.fillTable(mult or {}, 1, 4), 4)
+        offset = helper.resizeTable(helper.fillTable(offset or {}, 1, 4), 4)
+        args = helper.concat(mult, offset) 
+        helper.callMethod(tag ..'.setColorTransform', args)
+        
+        return
+    end
+    debug.error('nil_param', {'tag'}, 'color.setColorTransform:1')
 end
 
 return color

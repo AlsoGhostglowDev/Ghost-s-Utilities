@@ -1,230 +1,274 @@
----@meta util
----@author GhostglowDev
-
----@class Utilities
 local util = {}
 
-local c = require "ghostutil.color"
-local d = require "ghostutil.debug"
+local debug = require 'ghostutil.debug'
+local helper = require 'ghostutil.backend.helper'
+local bcompat = require 'ghostutil.backwards-compat'
+local color = require 'ghostutil.color'
 
-local _h = require "ghostutil._backend.helper"
-
----Tweens a number (the tweened values are returned on a callback called "onNumberTween")
----@param tag string for `onTweenCompleted`
----@param from number The number where the tween starts at
----@param to number The number where the tween stops at
----@param duration number The time it takes to complete
----@param ease string FlxEase
----@author GhostglowDev, T-Bar
-function util.doTweenNumber(tag, from, to, duration, ease)
-    if tag == nil or from == nil or to == nil then d.error("util.doTweenNumber:".. (tag == nil and "1" or ((tag == nil and (from == nil or to == nil)) and "1-2/3" or "2/3")) ..": Value is null/nil") return else
-        value, duration, ease = tostring(value), tostring(duration) or "1", ease or "linear"
-        runHaxeCode(
-            (version >= "0.7.0" and "game" or "PlayState.instance")..[[.modchartTweens.set(']]..tag..[[', 
-                FlxTween.num(]]..tostring(from)..[[, ]]..tostring(to)..[[, ]]..duration..[[, {
-                    ease: ]].. _h.getFlxEaseByString(ease) ..[[, 
-                    onComplete: () -> { 
-                        ]]..(version >= "0.7.0" and "game" or "PlayState.instance")..[[.callOnLuas("onTweenCompleted", ["]]..tag..[["]); 
-                        ]]..(version >= "0.7.0" and "game" or "PlayState.instance")..[[.modchartTweens.remove(']]..tag..[[');
-                    }
-                }, (num) -> {
-                    ]]..(version >= "0.7.0" and "game" or "PlayState.instance")..[[.callOnLuas("onNumberTween", ["]]..tag..[[", num]);
-                })
-            );
-        ]])
+util.initialized = false
+function util.init()
+    if not util.initialized then
+        addHaxeLibrary('FlxGradient', 'flixel.util')
+        addHaxeLibrary('FlxTextFormatMarkerPair', 'flixel.text')
+        addHaxeLibrary('FlxTextFormat', 'flixel.text')
+        addHaxeLibrary('FlxText', 'flixel.text')
+        addHaxeLibrary('System', 'openfl.system')
+        util.initialized = true
     end
 end
 
----Converts any value to a boolean
----@param v any Value
----@return boolean|any
-function util.toBool(v)
-    -- Conversion
-    if tostring(v) == "0" then return false
-    elseif tostring(v) == "1" then return true
-
-    elseif tostring(v) == "false" then return false
-    elseif tostring(v) == "true" then return true
-    else d.error("utilities.toBool:1: Failed converting value to a boolean")
+function util.doTweenNumber(tag, from, to, duration, options)
+    if tag ~= nil then
+        from = from or 0
+        to = to or 0
+        duration = duration or 1
+        local _options = bcompat.__buildOptions(tag, nil, options)
+        return debugPrint(('%s("%s", FlxTween.num( %s, %s, %s, %s, n -> game.callOnLuas("onNumberTween", ["%s", n]) ) );'):format(
+            version >= '1.0' and 'setVar' or 'game.modchartTweens.set',
+            tag, tostring(from), tostring(to), tostring(duration), _options, tag)
+        )
     end
-
-    return v
+    debug.error('nil_param', {'tag'}, 'util.doTweenNumber:1')
 end
 
----Runs a lua code from a file (any file format)
----@param file string The file to fetch (must include extension)
-function util.runCodeFromFile(file)
-    if io.open("mods/".. currentModDirectory .. file) == nil then d.error("util.runLuaFromFile: File '"..file.."' doesn't exist!") return end 
-
-    local loadCode = load or loadstring
-    loadCode(getTextFromFile(file))()
+function util.toboolean(value)
+    value = tostring(value)
+    return value == '1' or value == 'true'
 end
+util.toBoolean = util.toboolean
+util.toBool = util.toboolean
 
----More optimized version of makeGraphic
-function util.makeGraphic(obj, width, height, color)
-    makeGraphic(obj, 1, 1, color)
-    scaleObject(obj, (width or 256), (height or 256))
+function util.isnan(value)
+    return type(value) == 'number' and value ~= value
 end
+util.isNaN = util.isnan
 
----yeah man
----@param case any
----@param cases any
+util.isOfType = helper.isOfType
+
+function util.isnil(value)
+    return type(value) == nil
+end
+util.isNil = util.isnil
+util.isNull = util.isnil
+util.isnull = util.isnil
+
+function util.isbool(value)
+    return type(value) == "boolean"
+end
+util.isBool = util.isbool
+
+function util.isnumber(value)
+    return type(value) == "number"
+end
+util.isNumber = util.isnumber
+
+function util.isstring(value)
+    return type(value) == "string"
+end
+util.isString = util.isstring
+
+function util.istable(value)
+    return type(value) == "table"
+end
+util.isTable = util.istable
+
 function util.switch(case, cases)
     if (cases[case]) then cases[case]()
     elseif (cases["default"]) then cases["default"]() end
 end
 
----Checks if the given value is type `t`
----@param self any
----@param t string 
-function util.isOfType(self, t)
-    return type(self) == t:lower()
+function util.doTweenScale(tag, var, values, duration, ease)
+    values = helper.fillTable(values, 0, 2)
+    bcompat.startTween(tag, var ..'.scale', {x = values[0], y = values[0]}, duration, {
+        ease = ease,
+        onComplete = 'onTweenCompleted'
+    })
 end
 
----Checks if a value is nil
----@param v any
----@return boolean
-function util.isNil(self)
-    return type(self) == "nil"
+function util.doTweenPosition(tag, var, values, duration, ease)
+    values = helper.fillTable(values, 0, 2)
+    bcompat.startTween(tag, var, {x = values[0], y = values[0]}, duration, {
+        ease = ease,
+        onComplete = 'onTweenCompleted'
+    })
 end
 
----Checks if a value is NaN
-util.isNaN = util.isNil
----Checks if a value is null
-util.isNull = util.isNil
+function util.makeGradient(sprite, width, height, colors, chunkSize, rotation, interpolate)
+    util.init()
+    if sprite ~= nil then
+        width = width or 0
+        height = height or 0
+        chunkSize = chunkSize or 1
+        rotation = rotation or 90
+        interpolate = helper.resolveDefaultValue(interpolate, false)
 
----Checks if a value is a boolean
----@param self any
----@return boolean
-function util.isBool(self)
-    return type(self) == "boolean"
+        if colors ~= nil and #colors > 0 then
+            for i, col in ipairs(colors) do
+                if type(col) == 'string' then
+                    col = tonumber((stringStartsWith(col, '0x') and '' or '0x').. col)
+                end
+
+                local _color = color.rgbToARGB(col)
+                colors[i] = '0x'.. color.getHexString(_color)
+            end
+
+            return runHaxeCode(([[
+                var bmp = FlxGradient.createGradientBitmapData(%s, %s, %s, %s, %s, %s);
+                %s.loadGraphic(bmp);
+            ]]):format(width, height, helper.serialize(colors, 'array'):gsub("'", ''), chunkSize, rotation, tostring(interpolate), helper.parseObject(sprite)))
+        end
+        debug.error('nil_param', {'colors'}, 'util.makeGradient:4')
+        return
+    end
+    debug.error('nil_param', {'sprite'}, 'util.makeGradient:1')
 end
 
----Checks if a value is a number
----@param self any
----@return boolean
-function util.isNumber(self)
-    return type(self) == "number"
+function util.applyTextMarkup(tag, text, markerPair)
+    util.init()
+    if tag ~= nil then
+        text = text or getTextString(tag)
+        if markerPair == nil or helper.getDictLength(markerPair) <= 0 then
+            debug.error('nil_param', {'markerPair'}, 'util.applyTextMarkup:3')
+            return
+        end
+
+        local markups = {}
+        for seperator, col in pairs(markerPair) do
+            if type(col) == 'string' then
+                col = tonumber((stringStartsWith(col, '0x') and '' or '0x').. col)
+            end
+
+            local _color = color.rgbToARGB(col)
+            _color = '0x'.. color.getHexString(_color)
+            table.insert(markups, ('new FlxTextFormatMarkerPair(new FlxTextFormat(%s), %s)'):format(_color, helper.serialize(seperator, 'string')))
+        end
+
+        local instance = helper.parseObject(tag)
+        return runHaxeCode(('if (%s is FlxText) %s.applyMarkup(%s, [%s]);'):format(instance, instance, helper.serialize(text, 'string'), table.concat(markups, ', ')))
+    end
+    debug.error('nil_param', {'tag'}, 'util.applyTextMarkup:1')
 end
 
----Checks if a value is a string
----@param self any
----@return boolean
-function util.isString(self)
-    return type(self) == "string"
+function util.getHealthColor(character)
+    character = character:lower()
+    if character == 'bf' or character == 'player' then character = 'boyfriend' end
+    if character == 'opponent' or character == 'opp' then character = 'dad' end
+    if character == 'bopper' then character = 'gf' end
+    if helper.eqAny(character, {'boyfriend', 'dad', 'gf'}) then
+        return color.rgbToHex(getProperty(character ..'.healthColorArray'))
+    end
+    debug.error('wrong_type', {'bf, dad or gf', character}, 'util.getHealthColor:1')
+    return nil
 end
 
----Checks if a value is a table
----@param self any
----@return boolean
-function util.isTable(self)
-    return type(self) == "table"
+function util.setHealthBarColors(left, right)
+    if left ~= nil and right ~= nil then
+        if version >= '0.7' then setHealthBarColors(left, right) else 
+            if type(col) == 'string' then
+                left = tonumber((stringStartsWith(col, '0x') and '' or '0x').. left)
+                right = tonumber((stringStartsWith(col, '0x') and '' or '0x').. right)
+            end
+            left = color.rgbToARGB(left)
+            right = color.rgbToARGB(right)
+            helper.callMethod('healthBar.createFilledBar', {left, right})
+        end
+        return
+    end
+    local _missingParam = (left == nil and right == nil) and 'left & right:1&2' or (left == nil and 'left:1' or 'right:2')
+    local _sepMissing = stringSplit(_missingParam, ':')
+    debug.error('nil_param', { _sepMissing[1] }, 'util.setHealthBarColors'.. _sepMissing[2])
 end
 
----Basically, `debugPrint()` with Color
----@param texts table<string> The texts in a table, in a string
----@param color? string FlxColor
-function util.debugPrint(texts, color)
-    color = color or "0xFFFFFFFF"
-    color = (stringStartsWith(color, "0x") and color or "0xFF"..color)
-    for i = 1, #texts do
-        runHaxeCode("game.addTextToDebug('"..tostring(texts[i]).."', "..(color or "0xFFFFFFFF")..");")
+function util.setTimeBarColors(left, right)
+    if left ~= nil and right ~= nil then
+        if version >= '0.7' then setTimeBarColors(left, right) else 
+            if type(col) == 'string' then
+                left = tonumber((stringStartsWith(col, '0x') and '' or '0x').. left)
+                right = tonumber((stringStartsWith(col, '0x') and '' or '0x').. right)
+            end
+            left = color.rgbToARGB(left)
+            right = color.rgbToARGB(right)
+            helper.callMethod('timeBar.createFilledBar', {left, right})
+        end
+        return
+    end
+    local _missingParam = (left == nil and right == nil) and 'left & right:1&2' or (left == nil and 'left:1' or 'right:2')
+    local _sepMissing = stringSplit(_missingParam, ':')
+    debug.error('nil_param', { _sepMissing[1] }, 'util.setTimeBarColors'.. _sepMissing[2])
+end
+
+function util.getFps()
+    return getPropertyFromClass("Main", "fpsVar.currentFPS")
+end
+
+function util.getMemory()
+    util.init()
+    if version >= "0.7" then
+        return getPropertyFromClass("Main", "fpsVar.memoryMegas")
+    else
+        return runHaxeCode("return System.totalMemory;")
     end
 end
 
----All-in-one `makeLuaText()` 
----@param tag string Text tag
----@param txt string Text's string
----@param fieldWidth number Field width of the text
----@param pos table<number> Positions in a table. Example: {100, 300}
----@param instantAdd? boolean Do you want to add it without needing to use `addLuaText()` after?
----@param size? number Scale of the text. Example: {2, 2.45}
----@param alignment? string Left, center, right
----@param color? string FlxColor (color of the text)
----@param centerType? string xy, x, y. Set it to nil if you don't want it to center.
----@author Apollo
-function util.quickText(tag, txt, fieldWidth, pos, instantAdd, size, alignment, color, centerType)
-    pos = _h.resolveAlternative(pos, 2)
-    makeLuaText(tag, txt, fieldWidth, pos[1], pos[2])
-    setTextSize(tag, (size or 24))
-    setTextAlignment(tag, (alignment or "left"))
-    setTextColor(tag, (color or "FFFFFF"))
-    if instantAdd then
-        addLuaText(tag)
+function util.centerOrigin(object)
+    if helper.objectExists(object) then
+        return helper.callMethod(object ..'.centerOrigin', {})
     end
-    if centerType ~= nil then
-        screenCenter(tag, (centerType or "xy"))
-    end
+    debug.error('unrecog_el', {object, 'game'})
 end
 
-local function getCameraFromString(cam)
-    if cam:lower() == "hud" or cam:lower() == "camhud" then return "camHUD"
-    elseif cam:lower() == "other" or cam:lower() == "camother" then return "camOther"
-    else return "camGame" end
+function util.setOrigin(object, x, y)
+    if helper.objectExists(object) then
+        setProperty(object ..'.origin.x', x or 0)
+        setProperty(object ..'.origin.y', y or 0)
+    end
+    debug.error('unrecog_el', {object, 'game'})
 end
 
----All-in-one `makeLuaSprite()`, made as a lua sprite counterpart to the function 'quickText'.
----@param tag string Sprite tag
----@param filePath string Sprite's file path, starts in the "images" folder (in assets or in mods)
----@param pos table<number> Positions in a table. Example: {100, 300}
----@param instantAdd? boolean Do you want to add it without needing to use `addLuaSprite()` after?
----@param inFrontOfChars? boolean Is the sprite in front of the characters?
----@param scrollFactor? table<number> Scroll Factor of the sprite. Example: {3, 1}
----@param scale? table<number> Scale of the sprite. Example: {2, 2.45}
----@param camera? string What camera should the sprite be added on?
----@param color? string FlxColor (color of the sprite)
----@param centerType? string xy, x, y. Set it to nil if you don't want it to center.
----@param shader? string Name of the shader from the `shaders` folder
----@author T-Bar, inspired by Apollo
-function util.quickSprite(tag, filePath, pos, instantAdd, inFrontOfChars, scrollFactor, scale, camera, centerType, color, shader)
-    pos = _h.resolveAlternative(pos, 2)
-    scale = (util.isTable(scale) and {(scale or 1), (scale or 1)} or (scale or {1, 1}))
-    scrollFactor = (util.isTable(scrollFactor) and {(scrollFactor[1] or (getCameraFromString(camera) == "camGame" and 1 or 0)), (scrollFactor[2] or (getCameraFromString(camera) == "camGame" and 1 or 0))} or (scrollFactor or (getCameraFromString(camera) == "camGame" and {1, 1} or {0, 0})))
-	makeLuaSprite(tag, filePath, pos[1], pos[2])
-	scaleObject(tag, scale[1], scale[2])
-	setScrollFactor(tag, scrollFactor[1], scrollFactor[2])
-	c.setSpriteColor(tag, color)
-    setObjectCamera(tag, camera)
-	setObjectShader(tag, (shader or nil))
-	if instantAdd then
-		addLuaSprite(tag, (inFrontOfChars or false))
-	end
-    if ceneterType ~= nil then
-		screenCenter(tag, (centerType or "xy"))
+function util.getOrigin(object)
+    if helper.objectExists(object) then
+        return {
+            x = getProperty(object ..'.origin.x'),
+            y = getProperty(object ..'.origin.y')
+        }
     end
+    debug.error('unrecog_el', {object, 'game'})
 end
 
----All-in-one `makeGraphic()`, made as a lua graphic counterpart to the function 'quickSprite'.
----@param tag string Sprite tag
----@param pos table<number>|number Positions in a table. Example: {100, 300}. If both values are the same just put in the 
----@param dimensions table<number>|number 
----@param color? string FlxColor (color of the graphic)
----@param instantAdd? boolean Do you want to add it without needing to use `addLuaSprite` after?
----@param inFrontOfChars? boolean Is the graphic infront of the characters
----@param scrollFactor? table<number>|number Scroll factor of the graphic. Example: {3, 1}
----@param scale? table<number>|number Scale of the graphic. Example: {2, 2.1}
----@param camera? string "game", "hud" or "other"
----@param centerType? string xy, x, y. Set it to nil if you don't want it to center.
----@param shader? string Name of the shader the `shaders` folder
----@author GhostglowDev, inspired by Apollo and T-Bar
-function util.quickGraphic(tag, pos, dimensions, color, instantAdd, inFrontOfChars, scrollFactor, scale, camera, centerType, shader)
-    pos = _h.resolveAlternative(pos, 2)
-    dimensions = _h.resolveAlternative(dimensions, 2)
-    scale = (util.isTable(scale) and {(scale or 1), (scale or 1)} or (scale or {1, 1}))
-    scrollFactor = (util.isTable(scrollFactor) and {(scrollFactor or (getCameraFromString(camera) == "camGame" and 1 or 0)), (scrollFactor or (getCameraFromString(camera) == "camGame" and 1 or 0))} or (scrollFactor or (getCameraFromString(camera) == "camGame" and {1, 1} or {0, 0})))
-    makeLuaSprite(tag, nil, pos[1], pos[2])
-    makeGraphic(tag, dimensions[1], dimensions[2], (color or "FFFFFF"))
-	scaleObject(tag, scale[1], scale[2])
-	setScrollFactor(tag, (scrollFactor[1] or 1), (scrollFactor[2] or 1))
-    setObjectCamera(tag, camera)
-	setObjectShader(tag, (shader or nil))
-
-	if instantAdd then
-		addLuaSprite(tag, (inFrontOfChars or false))
-	end
-    if centerType ~= nil then
-		screenCenter(tag, (centerType or "xy"))
+function util.setPosition(object, x, y)
+    if helper.objectExists(object) then
+        setProperty(object ..'.x', x or 0)
+        setProperty(object ..'.y', y or 0)
     end
+    debug.error('unrecog_el', {object, 'game'})
+end
+
+function util.getPosition(object)
+    if helper.objectExists(object) then
+        return {
+            x = getProperty(object ..'.x'),
+            y = getProperty(object ..'.y')
+        }
+    end
+    debug.error('unrecog_el', {object, 'game'})
+end
+
+function util.setVelocity(object, x, y)
+    if helper.objectExists(object) then
+        setProperty(object ..'.velocity.x', x or 0)
+        setProperty(object ..'.velocity.y', y or 0)
+    end
+    debug.error('unrecog_el', {object, 'game'})
+end
+
+function util.getVelocity(object)
+    if helper.objectExists(object) then
+        return {
+            x = getProperty(object ..'.velocity.x'),
+            y = getProperty(object ..'.velocity.y')
+        }
+    end
+    debug.error('unrecog_el', {object, 'game'})
 end
 
 return util

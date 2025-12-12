@@ -1,44 +1,46 @@
----@meta web
----@author T-Bar, GhostglowDev
-
----@class Web
 local web = {}
 
----Gets the data from a website
----@param website string
----@return string
+local function printError(func, message)
+    if version > '0.7' then
+        debugPrint(('GHOSTUTIL ERROR: %s: %s'):format(func, message), 'red')
+    else
+        runHaxeCode(("game.addTextToDebug('GHOSTUTIL ERROR: %s: %s', 0xFFFF0000);"):format(func, message))
+    end
+end
+
 function web.getDataFromWebsite(website)
-    if website ~= nil then
+    if website ~= nil and #website > 0 then
         addHaxeLibrary("Http", "sys")
         
         runHaxeCode([[
             setVar("websiteData", '');
             var http = new Http("]]..website..[[");
             http.onData = function (data:String) {
-                setVar("websiteData", data);
+                setVar("__websiteData", data);
             }
             http.onError = function (error:String) {
-                setVar("websiteData", ['', '']);
+                setVar("__websiteData", ['', '']);
             }
             http.request();
         ]])
-        return runHaxeCode("return getVar('websiteData')")
+        return getVar('__websiteData')
     else
-        -- Debug uses this class so can't require it
-        runHaxeCode([[game.addTextToDebug('web.getDataFromWebsite:1: The argument "website" is not defined!', 0xFFFF0000);]])
+        printError('web.getDataFromWebsite:1', 'bad argument #1 (value expected)')
     end
 
     return ""
 end
 
----Loads a link from the argument 
----@param website string
-function web.browserLoad(website)
-    addHaxeLibrary("CoolUtil", version >= "0.7.0" and "backend" or "")
+function web.loadBrowser(website)
     if website ~= nil then
-		return runHaxeCode([[CoolUtil.browserLoad("]]..website..[[");]])
+        if version > '0.7' then
+            return callMethodFromClass('backend.CoolUtil', 'browserLoad', {website})
+        else
+            addHaxeLibrary('CoolUtil')
+		    return runHaxeCode('CoolUtil.browserLoad('.. website ..');')
+        end
 	else
-		runHaxeCode("game.addTextToDebug('web.browserLoad:1: the website argument is not defined', 0xFFFF0000);")
+		printError('web.loadBrowser:1', 'bad argument #1 (value expected)')
 	end
 end
 
