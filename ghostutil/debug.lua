@@ -13,6 +13,15 @@ local function split(str, del)
     return result
 end
 
+local function getTopLevelInfo(mode, max)
+    for i = 1, (max or 10) do
+        local info = debug.getinfo(i, mode)
+        if info == nil then
+            return debug.getinfo(i-2, mode)
+        end
+    end
+end
+
 local verFile = assert(io.open("ghostutil/ghostutil.version", "r"))
 dbg.verFile = split(verFile:read("*all"), "\n")
 dbg.version = dbg.verFile[1]
@@ -72,7 +81,7 @@ function dbg.exception(exception, excType, formattedText, func, exceptionMsg, le
     
     -- level 3 for calling in regular scripts,
     -- level 4 is for calling debug.error in ghostutil
-    local info = debug.getinfo(level or 4, "Sln") or debug.getinfo(3, "Sln")
+    local info = getTopLevelInfo('Sln', level)
     local exceptionSource = string.format('%s:%s', info.source:sub(2), info.currentline)
 
     -- 1: Exception Source, 2: Parent function, 3: Exception Message 

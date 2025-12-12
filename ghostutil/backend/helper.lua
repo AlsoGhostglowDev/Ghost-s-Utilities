@@ -46,15 +46,22 @@ end
 
 function resolveReflect(reffn, psychfn, args, minVer)
     minVer = minVer or '0.7'
-    if helper.reflect() == nil and version < minVer then
-        debug.error(nil, nil, 'COMPAT ERROR', 'You\'re currently using Psych Engine '.. version ..'.\nExtension "reflect.lua" is needed for running function "'.. reffn ..'"!')
+    if version < minVer then
+        if helper.reflect() == nil then
+            debug.error(nil, nil, 'COMPAT ERROR', 'You\'re currently using Psych Engine '.. version ..'.\nExtension "reflect.lua" is needed for running function "'.. reffn ..'"!')
+            return nil
+        end
+        return helper.reflect()[reffn](unpack(args))
     else
-        return version < tostring(minVer) and helper.reflect()[reffn](unpack(args)) or (psychfn ~= nil and psychfn(unpack(args)) or nil) 
+        if psychfn ~= nil then
+            return psychfn(unpack(args))
+        end
+        return nil
     end
 end
 
 function helper.instanceArg(instance, class)
-    return resolveReflect('instanceArg', instanceArg, {instance, class}, '0.7.2h')
+    return resolveReflect('instanceArg', instanceArg, {instance, class}, '1.0')
 end
 
 function helper.callMethod(method, args)

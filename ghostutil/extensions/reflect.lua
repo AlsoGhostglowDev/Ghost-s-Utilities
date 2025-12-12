@@ -84,6 +84,14 @@ local function _refreshImports()
     end
 end
 
+local function debugRun(code)
+    local ret = runHaxeCode(code)
+    if reflect.dev then
+        debugPrint(tostring(ret) ..' :: '.. code)
+    end
+    return ret
+end
+
 local function _getSepClass(class) 
     local sep = stringSplit(class, '.')
     local actualClass, package = sep[#sep], ''
@@ -166,19 +174,19 @@ local function _parseSingleInstance(arg)
                     debugPrint('-----------------------')
                 ]=]
 
-                if runHaxeCode('return '.. check[1]:format(instance) ..(check[2] and ' != null;' or ';')) then
+                if debugRun('return '.. check[1]:format(instance) ..(check[2] and ' != null;' or ';')) then
                     ret = check[3] or check[1]
                     break
                 end
             end
         else
-            if runHaxeCode('return '.. className ..'.'.. instance ..' != null;') then
+            if debugRun('return '.. className ..'.'.. instance ..' != null;') then
                 ret = className ..'.%s'
             end
 
             -- instance exception
-            if runHaxeCode('return '.. className ..'.instance != null;') then
-                if runHaxeCode('return '.. className ..'.instance.'.. instance ..' != null;') then
+            if debugRun('return '.. className ..'.instance != null;') then
+                if debugRun('return '.. className ..'.instance.'.. instance ..' != null;') then
                     ret = className ..'.instance.%s'
                 end
             end
@@ -254,7 +262,7 @@ local function _baseCallMethod(class, method, args, callInstanceMethod)
     end
 
     if (fromInstance and instance ~= 'null') or not fromInstance then
-        return runHaxeCode([[
+        return debugRun([[
             var method = ]].. (fromInstance and instance..'.' or (_getSepClass(class).class..(callInstanceMethod and '.instance.' or '.'))) .. method ..[[;
             if (method != null)
                 return method(]].. stringArgs ..[[);
@@ -299,8 +307,19 @@ local function _baseSetProperty(prop, value, allowMaps, allowInstances, classNam
     end
 
     local code = ((allowMaps and '%s.set("%s", %s);' or '%s = %s;').. ' return;')
-    runHaxeCode(code:format(
-        (allowMaps and instance or prop), (allowMaps and instanceProp or value), (allowMaps and value or '')
+    
+    for level = 1, 10 do
+        local info = debug.getinfo(level, 'Sln')
+        if info == nil then
+            break
+        end
+        debugPrint(('[%s] %s:%s'):format(tostring(level), info.source:sub(2), info.currentline))
+    end
+
+    debugRun(code:format(
+        (allowMaps and instance or prop), 
+        (allowMaps and instanceProp or value), 
+        (allowMaps and value or '')
     ))
 end
 
@@ -313,7 +332,7 @@ end
 function reflect.instanceArg(instance, class, forceReflectInstanceArg) 
     class = class or 'PlayState'
 
-    if version >= '0.7.2h' and not forceReflectInstanceArg then
+    if version >= '1.0' and not forceReflectInstanceArg then
         return instanceArg(instance, class)
     else
         local arg = _instancePre.. '::'.. instance ..(class ~= 'PlayState' and '::'..class or '')

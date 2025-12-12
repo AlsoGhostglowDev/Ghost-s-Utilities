@@ -12,6 +12,7 @@ function bcompat.__buildTweenCallback(callback, args)
 end
 
 function bcompat.__buildOptions(tag, object, options, onUpdate, onStart, onComplete)
+    options = options or {}
     local _twnType = helper.getTweenType(options.type)
     return ('{%s, %s, %s, %s, %s, %s, %s}'):format(
         'type: '.. tostring(_twnType),
