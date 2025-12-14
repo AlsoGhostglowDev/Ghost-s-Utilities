@@ -14,7 +14,8 @@ end
 function bcompat.__buildOptions(tag, object, options, onUpdate, onStart, onComplete)
     options = options or {}
     local _twnType = helper.getTweenType(options.type)
-    return ('{%s, %s, %s, %s, %s, %s, %s}'):format(
+
+    return ('{%s, %s, %s, %s, %s, %s, %s }'):format(
         'type: '.. tostring(_twnType),
         'startDelay: '.. tostring(options.startDelay or 0),
         'loopDelay: '.. tostring(options.loopDelay or 0),
@@ -22,7 +23,7 @@ function bcompat.__buildOptions(tag, object, options, onUpdate, onStart, onCompl
         'onUpdate: '.. bcompat.__buildFunction({'twn'}, bcompat.__buildTweenCallback(options.onUpdate, {'"tween_'.. tag ..'"', '"'.. tostring(object or 'null') ..'"'}) .. (onUpdate or '')),
         'onStart: '.. bcompat.__buildFunction({'twn'}, bcompat.__buildTweenCallback(options.onStart, {'"tween_'.. tag ..'"', '"'.. tostring(object or 'null') ..'"'}) .. (onStart or '')),
         'onComplete: '.. bcompat.__buildFunction({'twn'}, ('%s%s'):format(
-            (_twnType >= 8) and 'game.modchartTweens.remove("'.. tag ..'"); ' or '',
+            (_twnType >= 8) and (version >= '1.0' and 'variables.remove("'.. tag ..'"); ' or 'game.modchartTweens.remove("'.. tag ..'"); ') or '',
             bcompat.__buildTweenCallback(options.onComplete, {'"tween_'.. tag ..'"', '"'.. tostring(object or 'null') ..'"'}) .. (onComplete or '')
         ))
     )
@@ -56,11 +57,21 @@ function bcompat.startTween(tag, object, values, duration, options)
             bcompat.startTween(_tag ..'_'.. field, object ..'.'.. field, values, duration, options)
         end
 
+        if helper.getDictLength(values) < 1 then
+            return  -- stop the function since there's no "leftover" values
+        end
+
+        local _sepObj = stringSplit(object, '.')
+        local _object = _sepObj[1]
+        table.remove(_sepObj, 1)
+        local trailingProp = (#_sepObj >= 1 and '.' or '').. table.concat(_sepObj, '.')
+        local actualObject = helper.parseObject(_object) .. trailingProp
+
         duration = duration or 1
         local _options = bcompat.__buildOptions(tag, object, options)
         runHaxeCode(('%s("%s", FlxTween.tween( %s, %s, %s, %s ) );'):format(
             tag == nil and '' or 'game.modchartTweens.set', 
-            tag, helper.parseObject(object), helper.serialize(values, 'struct'), tostring(duration), _options
+            tag, actualObject, helper.serialize(values, 'struct'), tostring(duration), _options
         ))
     else
         startTween(tag, object, values, duration, options)

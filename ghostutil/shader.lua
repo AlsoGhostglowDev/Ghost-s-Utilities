@@ -20,11 +20,13 @@ function shader.init()
                 spr.__cacheBitmapData = null;
             }
             
-            setVar('fixShaderCoord', function() {
+            var fixShaderCoord = function() {
                 resetCamCache(game.camGame.flashSprite);
                 resetCamCache(game.camHUD.flashSprite);
                 resetCamCache(game.camOther.flashSprite);
-            });
+            }
+
+            FlxG.signals.gameResized.add(fixShaderCoord);
         ]])
         shader.initialized = true
     end
@@ -32,9 +34,6 @@ end
 
 function shader.fixShaderCoord()
     shader.init()
-
-    helper.callMethodFromClass('flixel.FlxG', 'signals.gameResized.add', {helper.instanceArg('fixShaderCoord')})
-    helper.callMethod('fixShaderCoord', {})
 end
 
 function shader.addCameraFilter(camera, filter, floats, tag)
@@ -42,14 +41,15 @@ function shader.addCameraFilter(camera, filter, floats, tag)
     tag = tag or filter
 
     local filtersField = getFiltersField()
-    if getProperty(camera .. filtersField) ~= nil then
-        helper.setProperty(camera .. filtersField, {})
+    if getProperty(camera .. filtersField) == nil then
+        helper.setProperty(camera .. filtersField, {''})
+        helper.callMethod(camera .. filtersField ..'.remove', {''})
     end
     
     makeLuaSprite(tag)
     setSpriteShader(tag, filter)
     helper.createInstance(tag ..'_filter', 'openfl.filters.ShaderFilter', {helper.instanceArg(tag ..'.shader')})
-    helper.callMethod(camera .. filtersField ..'.push', { helper.instanceArg(filter ..'_filter') })
+    helper.callMethod(camera .. filtersField ..'.push', { helper.instanceArg(tag ..'_filter') })
 
     for uniform, value in pairs(floats) do
         local setShaderFn = type(value) == 'table' and setShaderFloatArray or setShaderFloat
@@ -68,6 +68,7 @@ function shader.removeCameraFilter(camera, filter, tag, destroy)
         
         if helper.resolveDefaultValue(destroy, true) then
             removeLuaSprite(tag)
+            helper.callMethod('variables.remove', {tag ..'_filter'})
         end
 
         return
@@ -77,10 +78,12 @@ end
 
 function shader.clearCameraFilters(camera)
     camera = helper.getCameraFromString(camera)
-    helper.setProperty(camera .. getFiltersField(), {})
+    helper.setProperty(camera .. getFiltersField(), {''})
+    helper.callMethod(camera .. getFiltersField() ..'.remove', {''})
 
     for tag, filter in pairs(shader.filters) do
         removeLuaSprite(tag)
+        helper.callMethod('variables.remove', {tag ..'_filter'})
         shader.filters[tag] = nil
     end
 end
@@ -88,21 +91,27 @@ end
 function shader.tweenShaderFloat(tag, float, to, duration, options)
     if helper.objectExists(tag) then
         local _options = bcompat.__buildOptions(tag, nil, options)
-        return runHaxeCode(([[
+        runHaxeCode(([[
             var object = %s;
             var shader = object.shader;
             var float = %s;
-            FlxTween.num(shader.getFloat(float), %s, %s, %s, n -> shader.setFloat(float, n));
-        ]]):format(helper.parseObject(tag), helper.serialize(float, 'string'), tostring(to), tostring(duration), _options))
+            setVar("%s", FlxTween.num(shader.getFloat(float), %s, %s, %s, n -> shader.setFloat(float, n)));
+        ]]):format(helper.parseObject(tag), helper.serialize(float, 'string'), 'tween_'..tag, tostring(to), tostring(duration), _options))
+        return
     end
     debug.error('unrecog_el', {tag, 'game'}, 'shader.tweenShaderFloat:1')
 end
 
 function shader.clearRuntimeShader(shaderName)
+    local fn = shaderName ~= nil and 'runtimeShaders.remove' or 'runtimeShaders.clear'
     if version >= '0.7' then
-        return helper.callMethodFromClass('psychlua.FunkinLua', 'runtimeShaders.remove', {shaderName})
+        if getPropertyFromClass('psychlua.FunkinLua', 'runtimeShaders') ~= nil then
+            helper.callMethodFromClass('psychlua.FunkinLua', fn, {shaderName})
+        end
     else
-        return helper.callMethod('runtimeShaders.remove', {shaderName})
+        if getProperty('runtimeShaders') ~= nil then
+            helper.callMethod(fn, {shaderName})
+        end
     end
 end
 

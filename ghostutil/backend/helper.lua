@@ -7,41 +7,50 @@ helper.initialized = false
 helper.throwError = true
 
 function helper.init()
-    if not helper.initialized then
-        addHaxeLibrary('Lambda')
-        if version >= '0.7' then
-            createInstance('__gu_hscript__', 'psychlua.HScript', {nil, ''})
-            -- prevent creating a bunch of HScript instances for simple haxe codes
-            runHaxeCode([[
-                function luaObjectExists(tag:String)
-                    return game.getLuaObject(tag) != null;
-            ]])
+    if helper.legacyAvailable() then
+        if not helper.initialized then
+            addHaxeLibrary('Lambda')
+            if version >= '0.7' then
+                createInstance('__gu_hscript__', 'psychlua.HScript', {nil, ''})
+                -- prevent creating a bunch of HScript instances for simple haxe codes
+                runHaxeCode([[
+                    function luaObjectExists(tag:String)
+                        return game.getLuaObject(tag) != null;
+                ]])
+            end
+            helper.initialized = true
         end
-        helper.initialized = true
     end
 end
 
 function helper.reflect()
     local exists, reflect = pcall(helper.connect, 'reflect')
-    if version < '0.7' then
-        if not exists then
-            if helper.throwError then
-                runHaxeCode([[
-                    FlxG.stage.window.alert([
-                        'COMPATIBILITY ERROR!', 
-                        '',
-                        "You're currently using Psych Engine version ]].. version ..[[!", 
-                        "As of version 3.0.0, Ghost's Utilities no longer supports this version of Psych Engine.",
-                        '',
-                        'Either update to a later supported version (0.7 or higher), or install the "reflect" extension for a compatibility bridge.',
-                        'It is recommended that you update to the latest version for the best and more optimized experience.'
-                    ].join("\n"), "Ghost's Utilities: Fatal Error");
-                ]])
-            end
+    if helper.legacyAvaiable() then
+        if version < '1.0' and not exists and helper.throwError then
+            runHaxeCode([[
+                FlxG.stage.window.alert([
+                    'COMPATIBILITY ERROR!', 
+                    '',
+                    "You're currently using Psych Engine version ]].. version ..[[!", 
+                    "As of version 3.0.0, Ghost's Utilities no longer supports this version of Psych Engine.",
+                    '',
+                    'Either update to a later supported version (1.0 or higher), or install the "reflect" extension for a compatibility bridge.',
+                    'It is recommended that you update to the latest version for the best and more optimized experience.'
+                ].join("\n"), "Ghost's Utilities: Fatal Error");
+            ]])
             return nil
         end
     end
     return reflect
+end
+
+function helper.legacyAvailable()
+    if version < '0.7' then
+        if runHaxeCode == nil then 
+            return false 
+        end
+    end
+    return true
 end
 
 function resolveReflect(reffn, psychfn, args, minVer)
@@ -186,6 +195,17 @@ end
 
 function helper.isFloat(number)
     return not helper.isInt(number)
+end
+
+function helper.isDict(tbl)
+    if type(tbl) ~= 'table' then return false end
+
+    for k, _ in pairs(tbl) do
+        if type(k) ~= 'number' or k % 1 ~= 0 or k < 1 then
+            return true
+        end
+    end
+    return false
 end
 
 function helper.findIndex(tbl, el) 
@@ -366,7 +386,7 @@ end
 function helper.objectExists(obj)
     return helper.variableExists(obj) 
     or helper.luaObjectExists(obj) 
-    or helper.callMethodFromClass('Reflect', 'hasField', { helper.instanceArg('instance', version < '0.7' and 'PlayState' or 'states.PlayState'), obj })
+    or helper.callMethodFromClass('Reflect', 'hasField', {(version < '0.7' and 'PlayState' or 'states.PlayState').. '.instance', obj })
 end
 
 function helper.variableExists(var)
@@ -374,12 +394,7 @@ function helper.variableExists(var)
 end
 
 function helper.luaObjectExists(obj)
-    helper.init()
-    if version >= '0.7' then
-        return runHaxeFunction('luaObjectExists', {obj})
-    else
-        return runHaxeCode(('return game.getLuaObject("%s", true) != null;'):format(obj))
-    end
+    return runHaxeCode(('return game.getLuaObject("%s"'.. (version > '0.7' and ', true' or '') ..') != null;'):format(obj))
 end
 
 return helper

@@ -85,11 +85,10 @@ local function _refreshImports()
 end
 
 local function debugRun(code)
-    local ret = runHaxeCode(code)
     if reflect.dev then
-        debugPrint(tostring(ret) ..' :: '.. code)
+        debugPrint(code)
     end
-    return ret
+    return runHaxeCode(code)
 end
 
 local function _getSepClass(class) 
@@ -307,14 +306,6 @@ local function _baseSetProperty(prop, value, allowMaps, allowInstances, classNam
     end
 
     local code = ((allowMaps and '%s.set("%s", %s);' or '%s = %s;').. ' return;')
-    
-    for level = 1, 10 do
-        local info = debug.getinfo(level, 'Sln')
-        if info == nil then
-            break
-        end
-        debugPrint(('[%s] %s:%s'):format(tostring(level), info.source:sub(2), info.currentline))
-    end
 
     debugRun(code:format(
         (allowMaps and instance or prop), 

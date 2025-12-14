@@ -1,42 +1,65 @@
 local web = {}
 
 local function printError(func, message)
-    if version > '0.7' then
+    if version >= '0.7' then
         debugPrint(('GHOSTUTIL ERROR: %s: %s'):format(func, message), 'red')
     else
         runHaxeCode(("game.addTextToDebug('GHOSTUTIL ERROR: %s: %s', 0xFFFF0000);"):format(func, message))
     end
 end
 
-function web.getDataFromWebsite(website)
-    if website ~= nil and #website > 0 then
-        addHaxeLibrary("Http", "sys")
-        
-        runHaxeCode([[
-            setVar("websiteData", '');
-            var http = new Http("]]..website..[[");
-            http.onData = function (data:String) {
-                setVar("__websiteData", data);
-            }
-            http.onError = function (error:String) {
-                setVar("__websiteData", ['', '']);
-            }
-            http.request();
-        ]])
-        return getVar('__websiteData')
-    else
-        printError('web.getDataFromWebsite:1', 'bad argument #1 (value expected)')
+web.initialized = false
+function web.init()
+    if not web.initialized then
+        addHaxeLibrary('Http', 'sys')
+        if version < '0.7' then 
+            addHaxeLibrary('CoolUtil')
+        end
+        web.initialized = true
     end
+end
 
-    return ""
+web.getDataFromWebsite = web.getDataFromUrl
+function web.getDataFromUrl(url)
+	if url ~= nil and #url > 0 then
+        web.init()
+		return runHaxeCode([[
+			var retVal = null;
+			var http = new Http(']] ..url.. [[');
+			http.headers.push({name: 'User-Agent', value: 'request'});
+
+			http.onData = function(data:String) {
+				retVal = data;
+			}
+			/* // TODO: Use this to locate new target url in-case current link is a redirect
+			http.onStatus = function(s) {
+				if(s == 301 // Moved Permanently
+				|| s == 302 // Found, but Temporarily Moved
+				|| s == 307 // Temporary Redirect
+				|| s == 308 // Redirected Permanently
+				) {
+					retVal = _getUrlData(http.responseHeaders.get("Location"));
+				}
+			}
+			*/
+			http.onError = function (error:String) {
+				retVal = "ERROR";
+			}
+			http.request();
+			return retVal;
+		]]);
+	else
+		printError('web.getDataFromUrl:1', 'bad argument #1 (value expected)');
+	end
+    return '';
 end
 
 function web.loadBrowser(website)
+    web.init()
     if website ~= nil then
         if version > '0.7' then
             return callMethodFromClass('backend.CoolUtil', 'browserLoad', {website})
         else
-            addHaxeLibrary('CoolUtil')
 		    return runHaxeCode('CoolUtil.browserLoad('.. website ..');')
         end
 	else

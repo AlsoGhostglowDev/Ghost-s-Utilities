@@ -206,7 +206,7 @@ function window.createWindow(tag, attributes)
         debug.error('no_eq', {'tag ('.. tag ..')', 'an existing tag'}, 'window.createWindow:1')
         return
     end
-    debug.error('', {}, 'window.createWindow', 'This function is unavailable for this version.')
+    debug.error('', {}, 'window.createWindow', 'This function is not supported for this version.')
 end
 
 function window.closeWindow(tag)

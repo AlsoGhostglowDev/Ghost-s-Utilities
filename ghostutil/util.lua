@@ -4,6 +4,7 @@ local debug = require 'ghostutil.debug'
 local helper = require 'ghostutil.backend.helper'
 local bcompat = require 'ghostutil.backwards-compat'
 local color = require 'ghostutil.color'
+local dkjson = require 'ghostutil.backend.dkjson'
 
 util.initialized = false
 function util.init()
@@ -13,6 +14,13 @@ function util.init()
         addHaxeLibrary('FlxTextFormat', 'flixel.text')
         addHaxeLibrary('FlxText', 'flixel.text')
         addHaxeLibrary('System', 'openfl.system')
+        addHaxeLibrary('Type')
+        addHaxeLibrary('Reflect')
+        if version < '0.7' then
+            addHaxeLibrary('JsonParser', 'haxe.format')
+            addHaxeLibrary('JsonPrinter', 'haxe.format')
+        else addHaxeLibrary('TJSON', 'tjson') end
+
         util.initialized = true
     end
 end
@@ -23,10 +31,11 @@ function util.doTweenNumber(tag, from, to, duration, options)
         to = to or 0
         duration = duration or 1
         local _options = bcompat.__buildOptions(tag, nil, options)
-        return debugPrint(('%s("%s", FlxTween.num( %s, %s, %s, %s, n -> game.callOnLuas("onNumberTween", ["%s", n]) ) );'):format(
+        runHaxeCode(('%s("%s", FlxTween.num( %s, %s, %s, %s, n -> game.callOnLuas("onNumberTween", ["%s", n]) ) );'):format(
             version >= '1.0' and 'setVar' or 'game.modchartTweens.set',
             tag, tostring(from), tostring(to), tostring(duration), _options, tag)
         )
+        return
     end
     debug.error('nil_param', {'tag'}, 'util.doTweenNumber:1')
 end
@@ -79,7 +88,7 @@ end
 
 function util.doTweenScale(tag, var, values, duration, ease)
     values = helper.fillTable(values, 0, 2)
-    bcompat.startTween(tag, var ..'.scale', {x = values[0], y = values[0]}, duration, {
+    bcompat.startTween(tag, var ..'.scale', {x = values[0], y = values[1]}, duration, {
         ease = ease,
         onComplete = 'onTweenCompleted'
     })
@@ -87,7 +96,7 @@ end
 
 function util.doTweenPosition(tag, var, values, duration, ease)
     values = helper.fillTable(values, 0, 2)
-    bcompat.startTween(tag, var, {x = values[0], y = values[0]}, duration, {
+    bcompat.startTween(tag, var, {x = values[0], y = values[1]}, duration, {
         ease = ease,
         onComplete = 'onTweenCompleted'
     })
@@ -112,10 +121,11 @@ function util.makeGradient(sprite, width, height, colors, chunkSize, rotation, i
                 colors[i] = '0x'.. color.getHexString(_color)
             end
 
-            return runHaxeCode(([[
+            runHaxeCode(([[
                 var bmp = FlxGradient.createGradientBitmapData(%s, %s, %s, %s, %s, %s);
                 %s.loadGraphic(bmp);
             ]]):format(width, height, helper.serialize(colors, 'array'):gsub("'", ''), chunkSize, rotation, tostring(interpolate), helper.parseObject(sprite)))
+            return
         end
         debug.error('nil_param', {'colors'}, 'util.makeGradient:4')
         return
@@ -144,7 +154,7 @@ function util.applyTextMarkup(tag, text, markerPair)
         end
 
         local instance = helper.parseObject(tag)
-        return runHaxeCode(('if (%s is FlxText) %s.applyMarkup(%s, [%s]);'):format(instance, instance, helper.serialize(text, 'string'), table.concat(markups, ', ')))
+        return runHaxeCode(('if (Std.isOfType(%s, FlxText)) %s.applyMarkup(%s, [%s]); return;'):format(instance, instance, helper.serialize(text, 'string'), table.concat(markups, ', ')))
     end
     debug.error('nil_param', {'tag'}, 'util.applyTextMarkup:1')
 end
@@ -164,10 +174,8 @@ end
 function util.setHealthBarColors(left, right)
     if left ~= nil and right ~= nil then
         if version >= '0.7' then setHealthBarColors(left, right) else 
-            if type(col) == 'string' then
-                left = tonumber((stringStartsWith(col, '0x') and '' or '0x').. left)
-                right = tonumber((stringStartsWith(col, '0x') and '' or '0x').. right)
-            end
+            left = type(left) == 'string' and tonumber((stringStartsWith(col, '0x') and '' or '0x').. left) or left
+            right = type(right) == 'string' and tonumber((stringStartsWith(col, '0x') and '' or '0x').. right) or right
             left = color.rgbToARGB(left)
             right = color.rgbToARGB(right)
             helper.callMethod('healthBar.createFilledBar', {left, right})
@@ -182,10 +190,8 @@ end
 function util.setTimeBarColors(left, right)
     if left ~= nil and right ~= nil then
         if version >= '0.7' then setTimeBarColors(left, right) else 
-            if type(col) == 'string' then
-                left = tonumber((stringStartsWith(col, '0x') and '' or '0x').. left)
-                right = tonumber((stringStartsWith(col, '0x') and '' or '0x').. right)
-            end
+            left = type(left) == 'string' and tonumber((stringStartsWith(col, '0x') and '' or '0x').. left) or left
+            right = type(right) == 'string' and tonumber((stringStartsWith(col, '0x') and '' or '0x').. right) or right
             left = color.rgbToARGB(left)
             right = color.rgbToARGB(right)
             helper.callMethod('timeBar.createFilledBar', {left, right})
@@ -212,7 +218,10 @@ end
 
 function util.centerOrigin(object)
     if helper.objectExists(object) then
-        return helper.callMethod(object ..'.centerOrigin', {})
+        return util.setOrigin(object,
+            getProperty(object ..'.frameWidth') / 2,
+            getProperty(object ..'.frameHeight') / 2
+        )
     end
     debug.error('unrecog_el', {object, 'game'})
 end
@@ -221,6 +230,7 @@ function util.setOrigin(object, x, y)
     if helper.objectExists(object) then
         setProperty(object ..'.origin.x', x or 0)
         setProperty(object ..'.origin.y', y or 0)
+        return
     end
     debug.error('unrecog_el', {object, 'game'})
 end
@@ -239,6 +249,7 @@ function util.setPosition(object, x, y)
     if helper.objectExists(object) then
         setProperty(object ..'.x', x or 0)
         setProperty(object ..'.y', y or 0)
+        return
     end
     debug.error('unrecog_el', {object, 'game'})
 end
@@ -255,8 +266,9 @@ end
 
 function util.setVelocity(object, x, y)
     if helper.objectExists(object) then
-        setProperty(object ..'.velocity.x', x or 0)
-        setProperty(object ..'.velocity.y', y or 0)
+        helper.setProperty(object ..'.velocity.x', x or 0)
+        helper.setProperty(object ..'.velocity.y', y or 0)
+        return
     end
     debug.error('unrecog_el', {object, 'game'})
 end
@@ -269,6 +281,19 @@ function util.getVelocity(object)
         }
     end
     debug.error('unrecog_el', {object, 'game'})
+end
+
+function util.parseJSON(str)
+	local obj, pos, err = dkjson.decode(str, 1, nil)
+    if err then
+		debug.error('nil_param', {}, 'util.safeParseJSON', tostring(err))
+		return {}
+	end
+	return obj
+end
+
+function util.stringifyJSON(dict, useIndent)
+	return dkjson.encode(dict, {indent = useIndent})
 end
 
 return util

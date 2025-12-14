@@ -84,8 +84,8 @@ function color.getGreen(int)
     return color.extractChannels(int).green
 end
 
-function color.setColor(tag, color)
-    setProperty(tag ..'.color', color.argbToRGB(color))
+function color.setColor(tag, col)
+    setProperty(tag ..'.color', color.argbToRGB(col))
 end
 
 function color.setColorTransform(tag, mult, offset)

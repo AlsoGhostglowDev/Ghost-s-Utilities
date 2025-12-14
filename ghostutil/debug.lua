@@ -6,11 +6,13 @@ dbg.dev = false
 -- from Stack Overflow:
 -- https://stackoverflow.com/a/20100401
 local function split(str, del)
-    result = {}
-    for match in (str..del):gmatch("(.-)"..del) do
-        table.insert(result, match)
-    end
-    return result
+    if not stringSplit then
+        result = {}
+        for match in (str..del):gmatch("(.-)"..del) do
+            table.insert(result, match)
+        end
+        return result
+    else return stringSplit(str, del) end
 end
 
 local function getTopLevelInfo(mode, max)
@@ -46,12 +48,12 @@ function dbg.getLatest(index)
 end
 function dbg.getLatestVersion() 
     local ret = dbg.getLatest(1) 
-    if ret == '' then dbg.error("debug.getLatestVersion: User is offline") ; return nil end 
+    if ret == '' then dbg.error("debug.getLatestVersion: User is offline") ; return 'N/A' end 
     return ret 
 end
 function dbg.getLatestStage() 
     local ret = dbg.getLatest(2) 
-    if ret == "" then dbg.error("debug.getLatestVersion: User is offline") ; return nil end 
+    if ret == "" then dbg.error("debug.getLatestVersion: User is offline") ; return 'N/A' end 
     return ret 
 end
 
