@@ -16,10 +16,6 @@ function util.init()
         addHaxeLibrary('System', 'openfl.system')
         addHaxeLibrary('Type')
         addHaxeLibrary('Reflect')
-        if version < '0.7' then
-            addHaxeLibrary('JsonParser', 'haxe.format')
-            addHaxeLibrary('JsonPrinter', 'haxe.format')
-        else addHaxeLibrary('TJSON', 'tjson') end
 
         util.initialized = true
     end
@@ -31,9 +27,10 @@ function util.doTweenNumber(tag, from, to, duration, options)
         to = to or 0
         duration = duration or 1
         local _options = bcompat.__buildOptions(tag, nil, options)
+        local tweenPre = bcompat.__getTweenPrefix()
         runHaxeCode(('%s("%s", FlxTween.num( %s, %s, %s, %s, n -> game.callOnLuas("onNumberTween", ["%s", n]) ) );'):format(
             version >= '1.0' and 'setVar' or 'game.modchartTweens.set',
-            tag, tostring(from), tostring(to), tostring(duration), _options, tag)
+            tweenPre .. tag, tostring(from), tostring(to), tostring(duration), _options, tag)
         )
         return
     end

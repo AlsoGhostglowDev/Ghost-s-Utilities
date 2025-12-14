@@ -45,7 +45,11 @@ function shader.addCameraFilter(camera, filter, floats, tag)
         helper.setProperty(camera .. filtersField, {''})
         helper.callMethod(camera .. filtersField ..'.remove', {''})
     end
-    
+
+    --[=[ 
+        "what, no runHaxeCode? BULLSHIT!"
+        - average psych ward user
+    ]=]
     makeLuaSprite(tag)
     setSpriteShader(tag, filter)
     helper.createInstance(tag ..'_filter', 'openfl.filters.ShaderFilter', {helper.instanceArg(tag ..'.shader')})
@@ -91,12 +95,13 @@ end
 function shader.tweenShaderFloat(tag, float, to, duration, options)
     if helper.objectExists(tag) then
         local _options = bcompat.__buildOptions(tag, nil, options)
+        local tweenPre = bcompat.__getTweenPrefix()
         runHaxeCode(([[
             var object = %s;
             var shader = object.shader;
             var float = %s;
-            setVar("%s", FlxTween.num(shader.getFloat(float), %s, %s, %s, n -> shader.setFloat(float, n)));
-        ]]):format(helper.parseObject(tag), helper.serialize(float, 'string'), 'tween_'..tag, tostring(to), tostring(duration), _options))
+            %s("%s", FlxTween.num(shader.getFloat(float), %s, %s, %s, n -> shader.setFloat(float, n)));
+        ]]):format(helper.parseObject(tag), helper.serialize(float, 'string'), (version >= '1.0' and 'setVar' or 'game.modchartTweens.set'), tweenPre .. tag, tostring(to), tostring(duration), _options))
         return
     end
     debug.error('unrecog_el', {tag, 'game'}, 'shader.tweenShaderFloat:1')

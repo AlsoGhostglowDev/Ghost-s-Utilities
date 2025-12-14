@@ -133,11 +133,11 @@ function window.cancelTween(tag)
 end
 
 function window.pauseTween(tag)
-    helper.callMethod((version >= '1.0' and '' or 'modchartTweens.').. tag ..'.pause', {})
+    helper.callMethod((version >= '1.0' and '' or 'modchartTweens.').. tag ..'.pause', {''})
 end
 
 function window.resumeTween(tag)
-    helper.callMethod((version >= '1.0' and '' or 'modchartTweens.').. tag ..'.pause', {})
+    helper.callMethod((version >= '1.0' and '' or 'modchartTweens.').. tag ..'.pause', {''})
 end
 
 function window.setIcon(image)
@@ -163,7 +163,7 @@ end
 
 function window.focus()
     window.init()
-    helper.callMethod('window.focus', {})
+    helper.callMethod('window.focus', {''})
 end
 
 window.extraWindows = {}
@@ -211,7 +211,7 @@ end
 
 function window.closeWindow(tag)
     if helper.existsFromTable(window.extraWindows, tag) then
-        callMethod(tag ..'.close', {})
+        helper.callMethod(tag ..'.close', {''})
         table.remove(window.extraWindows, helper.findIndex(window.extraWindows, tag))
     
         return

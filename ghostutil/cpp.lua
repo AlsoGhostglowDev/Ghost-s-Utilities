@@ -1,7 +1,6 @@
 local cpp = {}
 
 local debug = require "ghostutil.debug"
-local helper = require "ghostutil.backend.helper"
 
 local ffi = require("ffi")
 local user32 = ffi.load("user32")
@@ -29,7 +28,7 @@ ffi.cdef([[
 	typedef const char* LPCSTR;
 	typedef unsigned UINT;
 	typedef int BOOL;
-	
+
 	typedef void* CONST;
     typedef unsigned long DWORD;
 	typedef DWORD COLORREF;
@@ -37,20 +36,20 @@ ffi.cdef([[
 	typedef const void *LPCVOID;
 	typedef long LONG;
 	typedef LONG HRESULT;
-	
+
 	typedef int ULONGLONG;
 	typedef ULONGLONG *PULONGLONG;
-	
+
 	HWND GetActiveWindow();
 	void UpdateWindow(HWND hWnd);
-	
+
 	BOOL DestroyWindow(HWND hWnd);
 	BOOL ShowWindow(HWND hWnd, int nCmdShow);
 	BOOL IsWindow(HWND hWnd);
 	HWND FindWindowA(LPCSTR lpClassName, LPCSTR lpWindowName);
 	BOOL SetWindowPos(HWND hWnd, HWND hWndInsertAfter, int X, int Y, int cx, int cy, unsigned int uFlags);
 	BOOL IsWindowEnabled(HWND hWnd);
-	
+
 	BOOL SetLayeredWindowAttributes(HWND hwnd, COLORREF crKey, BYTE bAlpha, DWORD dwFlags);
 	LONG SetWindowLongA(HWND hWnd, int nIndex, LONG dwNewLong);
 	LONG GetWindowLongA(HWND hWnd, int nIndex);
@@ -81,7 +80,7 @@ cpp.DWMWA_COLOR_NONE = 0xFFFFFFFE
 cpp.DWMWA_COLOR_DEFAULT = 0xFFFFFFFF
 cpp.windowColorMode = {
 	DARK = 1,
-	LIGHT = 1
+	LIGHT = 0
 }
 
 cpp.windowCornerType = {
@@ -136,11 +135,14 @@ cpp.arch = ffi.arch
 ---------------------------------------------------------------------
 
 function cpp.makeMessageBox(title, message, msgForm, msgIcon)
-	if message == nil or title == nil then
-		debug.error("cpp.makeMessageBox: the parameter \"" ..(title == nil and "title" or "message").. "\" is nil.")
-	else
+	if title ~= nil and message ~= nil then
 		return user32.MessageBoxA(nil, tostring(message), tostring(title), ((msgForm ~= nil) and msgForm or 0) + ((msgIcon ~= nil) and msgIcon or 0))
+	else
+		local _missingParam = (title == nil and message == nil) and 'title & message:1&2' or (title == nil and 'title:1' or 'message:2')
+		local _sepMissing = stringSplit(_missingParam, ':')
+		debug.error('nil_param', { _sepMissing[1] }, 'cpp.makeMessageBox:'.. _sepMissing[2])
 	end
+	return -1
 end
 
 function cpp.setWindowZPos(zPos)
@@ -169,12 +171,16 @@ end
 
 function cpp.destroyWindow(windowHWND)
 	if windowHWND ~= nil then 
-		if cpp.windowExists(windowHWND) then user32.DestroyWindow(windowHWND) else 
-			debug.error("cpp.destroyWindow: no window was found. Does the specified window exist?") 
+		if cpp.windowExists(windowHWND) then 
+			user32.DestroyWindow(windowHWND)
+			return true
+		else 
+			debug.error('nil_param', {}, 'cpp.destroyWindow:1', 'No window was found. Does the specified window exist?')
 		end
 	else 
-		debug.error("cpp.destroyWindow: the parameter \"windowHWND\" is nil.")
+		debug.error('nil_param', {'windowHWND'}, 'cpp.destroyWindow:1')
 	end
+	return false
 end
 
 function cpp.registerDPICompatible()
@@ -206,7 +212,7 @@ function cpp.setWindowTransparency(win, chroma)
 	local hWnD = win
     if hWnD == nil then
 		hWnD = ffi.C.GetActiveWindow()
-		debug.warn("cpp.setWindowTransparency: no window was found. Using the active window instead.")
+		debug.warn('nil_param', {}, 'cpp.setWindowTransparency:1', 'No window was found. Using the active window instead.')
     end
     if ffi.C.SetWindowLongA(hWnD, -20, 0x00080000) == 0 then end
     if ffi.C.SetLayeredWindowAttributes(hWnD, ((chroma ~= nil) and tonumber(chroma) or -29292929) , 0, 0x00000001) == 0 then end
@@ -223,7 +229,7 @@ function cpp.setDarkMode()
 	if isDark == 0 or isDark ~= S_OK then
 		dwmapi.DwmSetWindowAttribute(window, 20, ffi.new("int[1]", cpp.addressOf(cpp.windowColorMode.DARK)), ffi.sizeof(ffi.cast("DWORD", cpp.windowColorMode.DARK)))
 	end
-	
+
 	ffi.C.UpdateWindow(window)
 end
 
@@ -234,7 +240,7 @@ function cpp.setLightMode()
 	if isLight == 0 or isLight ~= S_OK then
 		dwmapi.DwmSetWindowAttribute(window, 20, ffi.new("int[1]", 0), ffi.sizeof(ffi.cast("DWORD", 0)))
 	end
-	
+
 	ffi.C.UpdateWindow(window)
 end
 
@@ -247,10 +253,10 @@ function cpp.setWindowBorderColor(colorHex, setHeader, setBorder)
 	local window = ffi.C.GetActiveWindow()
 	local strHex = (colorHex == nil or (type(colorHex) ~= 'number' and #colorHex < 6 or false)) and '0xFFFFFF' or _rgbHexToBGR(colorHex)
 	local hex = tonumber('0x'..strHex)
-	
+
 	if setHeader == nil then setHeader = true end
 	if setBorder == nil then setBorder = true end
-	
+
 	if setHeader then dwmapi.DwmSetWindowAttribute(window, 35, ffi.new("int[1]", cpp.addressOf(hex)), ffi.sizeof(ffi.cast("DWORD", (hex)))) end
 	if setBorder then dwmapi.DwmSetWindowAttribute(window, 34, ffi.new("int[1]", cpp.addressOf(hex)), ffi.sizeof(ffi.cast("DWORD", (hex)))) end
 
@@ -261,7 +267,7 @@ function cpp.setWindowTextColor(colorHex)
 	local window = ffi.C.GetActiveWindow()
 	local strHex = (colorHex == nil or (type(colorHex) ~= 'number' and #colorHex < 6 or false)) and '0xFFFFFF' or _rgbHexToBGR(colorHex)
 	local hex = tonumber('0x'..strHex)
-	
+
 	dwmapi.DwmSetWindowAttribute(window, 36, ffi.new("int[1]", cpp.addressOf(hex)), ffi.sizeof(ffi.cast("DWORD", (hex))))
 
 	ffi.C.UpdateWindow(window)
@@ -334,7 +340,7 @@ function _rgbHexToBGR(rgb)
 	if type(rgb) == 'number' then rgb = string.format("%x", rgb):upper() end
 	-- discard if hex isn't string
 	if type(rgb) ~= 'string' then 
-		debugPrint('ERROR on loading: '.. scriptName ..': _rgbHexToBGR: Failed to parse into BGR format.') 
+		debug.error('nil_param', {}, 'cpp._rgbHexToBGR:1', 'Failed to parse ' ..tostring(rgb).. ' into the BGR format.')
 		return rgb
 	end
 	-- discard extras

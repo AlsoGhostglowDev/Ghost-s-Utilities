@@ -19,7 +19,6 @@ function web.init()
     end
 end
 
-web.getDataFromWebsite = web.getDataFromUrl
 function web.getDataFromUrl(url)
 	if url ~= nil and #url > 0 then
         web.init()
@@ -53,6 +52,8 @@ function web.getDataFromUrl(url)
 	end
     return '';
 end
+web.getDataFromWeb = web.getDataFromUrl
+web.getDataFromWebsite = web.getDataFromUrl
 
 function web.loadBrowser(website)
     web.init()

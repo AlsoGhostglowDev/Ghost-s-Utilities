@@ -11,20 +11,25 @@ function bcompat.__buildTweenCallback(callback, args)
     return string.format('game.callOnLuas("%s", [%s]);', callback or '', table.concat(args or {}, ', '))
 end
 
+function bcompat.__getTweenPrefix()
+    return (version >= '1.0' and 'tween_' or '')
+end
+
 function bcompat.__buildOptions(tag, object, options, onUpdate, onStart, onComplete)
     options = options or {}
     local _twnType = helper.getTweenType(options.type)
+    local _twnPre = bcompat.__getTweenPrefix()
 
     return ('{%s, %s, %s, %s, %s, %s, %s }'):format(
         'type: '.. tostring(_twnType),
         'startDelay: '.. tostring(options.startDelay or 0),
         'loopDelay: '.. tostring(options.loopDelay or 0),
         'ease: '.. helper.getTweenEaseByString(options.ease),
-        'onUpdate: '.. bcompat.__buildFunction({'twn'}, bcompat.__buildTweenCallback(options.onUpdate, {'"tween_'.. tag ..'"', '"'.. tostring(object or 'null') ..'"'}) .. (onUpdate or '')),
-        'onStart: '.. bcompat.__buildFunction({'twn'}, bcompat.__buildTweenCallback(options.onStart, {'"tween_'.. tag ..'"', '"'.. tostring(object or 'null') ..'"'}) .. (onStart or '')),
+        'onUpdate: '.. bcompat.__buildFunction({'twn'}, bcompat.__buildTweenCallback(options.onUpdate, {'"'.. tweenPre .. tag ..'"', '"'.. tostring(object or 'null') ..'"'}) .. (onUpdate or '')),
+        'onStart: '.. bcompat.__buildFunction({'twn'}, bcompat.__buildTweenCallback(options.onStart, {'"'.. tweenPre .. tag ..'"', '"'.. tostring(object or 'null') ..'"'}) .. (onStart or '')),
         'onComplete: '.. bcompat.__buildFunction({'twn'}, ('%s%s'):format(
             (_twnType >= 8) and (version >= '1.0' and 'variables.remove("'.. tag ..'"); ' or 'game.modchartTweens.remove("'.. tag ..'"); ') or '',
-            bcompat.__buildTweenCallback(options.onComplete, {'"tween_'.. tag ..'"', '"'.. tostring(object or 'null') ..'"'}) .. (onComplete or '')
+            bcompat.__buildTweenCallback(options.onComplete, {'"'.. tweenPre .. tag ..'"', '"'.. tostring(object or 'null') ..'"'}) .. (onComplete or '')
         ))
     )
 end
@@ -76,6 +81,12 @@ function bcompat.startTween(tag, object, values, duration, options)
     else
         startTween(tag, object, values, duration, options)
     end
+end
+
+function bcompat.runHaxeFunction(funcToRun, args)
+    if version < '0.7' then
+        return helper.callMethodFromClass('FunkinLua', 'hscript.interp.call', {funcToRun, args})
+    else return runHaxeFunction(funcToRun, args) end
 end
 
 bcompat.instanceArg = helper.instanceArg

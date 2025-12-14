@@ -122,6 +122,10 @@ function helper.getCameraFromString(camera)
     end
 end
 
+function helper.getType(result)
+    return type(result) == 'table' and (helper.isDict(result) and 'dictionary' or 'table') or type(result)
+end
+
 function helper.serialize(value, t)
     if t == 'string' then
         if type(value) == 'string' then
@@ -131,7 +135,7 @@ function helper.serialize(value, t)
         if type(value) == 'table' then
             local arr = '['
             for i, v in ipairs(value) do
-                arr = arr .. helper.serialize(v, type(v)) .. (i == #value and '' or ', ')
+                arr = arr .. helper.serialize(v, helper.getType(v)) .. (i == #value and '' or ', ')
             end
 
             return arr ..']'
@@ -142,7 +146,7 @@ function helper.serialize(value, t)
             local i = 0
             for k, v in pairs(value) do
                 i = i + 1
-                map = map .. helper.serialize(k, type(k)) .. ' => ' .. helper.serialize(v, type(v)) .. (i == helper.getDictLength(value) and '' or ', ')
+                map = map .. helper.serialize(k, type(k)) .. ' => ' .. helper.serialize(v, helper.getType(v)) .. (i == helper.getDictLength(value) and '' or ', ')
             end
             return map ..']'
         end
@@ -152,13 +156,17 @@ function helper.serialize(value, t)
             local i = 0
             for k, v in pairs(value) do
                 i = i + 1
-                struct = struct .. k .. ': ' .. helper.serialize(v, type(v)) .. (i == helper.getDictLength(value) and '' or ', ')
+                struct = struct .. k .. ': ' .. helper.serialize(v, helper.getType(v)) .. (i == helper.getDictLength(value) and '' or ', ')
             end
             return struct ..'}'
         end
     elseif t == 'bool' or t == 'boolean' then
         if type(value) == 'boolean' then
             return tostring(value)
+        end
+    elseif t == 'function' then
+        if type(value) == 'function' then
+            return '() -> {}'
         end
     end
     return value
@@ -262,6 +270,22 @@ end
 function helper.resizeTable(tbl, length)
     while #tbl > length do
         table.remove(tbl, #tbl)
+    end
+    return tbl
+end
+
+function helper.arrayComprehension(from, to, fn)
+    local tbl = {}
+    for i = from, to do
+        tbl[i] = fn(i)
+    end
+    return tbl
+end
+
+function helper.mapComprehension(keys, fn)
+    local tbl = {}
+    for i, key in ipairs(keys) do
+        tbl[key] = fn(key)
     end
     return tbl
 end

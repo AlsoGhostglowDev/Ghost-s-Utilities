@@ -43,12 +43,9 @@ function file.append(filePath, content)
 end
 
 function file.read(filePath)
-    if not getTextFromFile then
-        return open(filePath, 'r', function(file)
-            file:read('*a')
-        end)
-    end
-    return getTextFromFile(filePath)
+    return open(filePath, 'r', function(file)
+        return file:read('*a')
+    end)
 end
 
 function file.exists(filePath)

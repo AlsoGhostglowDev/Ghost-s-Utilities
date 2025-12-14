@@ -1,15 +1,10 @@
----@meta Github API
----@author T-Bar
-
----Functions that interact with the Github API
----@class Github
-
 local git = {}
 
 local web = require "ghostutil.web"
 local util = require "ghostutil.util"
 
-git.GITHUB_API_URL = "https://api.github.com/"
+git.GITHUB_API_URL = "https://api.github.com/";
+git.GITHUB_RAW_URL = {"https://raw.githubusercontent.com/", "refs/heads/main/"};
 
 local function getAndParse(url, isArray)
     local data = util.parseJSON(web.getDataFromUrl(url));
@@ -24,7 +19,7 @@ function git.getRepository(user, repository)
     return getAndParse(git.GITHUB_API_URL ..'repos/'.. user ..'/'.. repository)
 end
 
---TODO
+-- TODO
 function git.getBranches(user, repository)
     return getAndParse(git.GITHUB_API_URL ..'repos/'.. user ..'/'.. repository.. '/branches')
 end
@@ -82,6 +77,10 @@ end
 function git.getRepositoryCommits()
 	local retVal = getAndParse(git.GITHUB_API_URL ..'repos/'.. user ..'/'.. repository.. '/commits');
     return (retVal or {});
+end
+
+function git.getRepositoryRawText(user, repository, filePath)
+	return web.getDataFromUrl(git.GITHUB_RAW_URL[1] .. user ..'/'.. repository ..'/'.. git.GITHUB_RAW_URL[2] .. filePath);
 end
 
 return git
