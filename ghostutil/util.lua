@@ -180,7 +180,7 @@ function util.setHealthBarColors(left, right)
         return
     end
     local _missingParam = (left == nil and right == nil) and 'left & right:1&2' or (left == nil and 'left:1' or 'right:2')
-    local _sepMissing = stringSplit(_missingParam, ':')
+    local _sepMissing = helper.stringSplit(_missingParam, ':')
     debug.error('nil_param', { _sepMissing[1] }, 'util.setHealthBarColors'.. _sepMissing[2])
 end
 
@@ -196,7 +196,7 @@ function util.setTimeBarColors(left, right)
         return
     end
     local _missingParam = (left == nil and right == nil) and 'left & right:1&2' or (left == nil and 'left:1' or 'right:2')
-    local _sepMissing = stringSplit(_missingParam, ':')
+    local _sepMissing = helper.stringSplit(_missingParam, ':')
     debug.error('nil_param', { _sepMissing[1] }, 'util.setTimeBarColors'.. _sepMissing[2])
 end
 

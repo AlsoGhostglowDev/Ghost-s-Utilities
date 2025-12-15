@@ -25,11 +25,11 @@ function bcompat.__buildOptions(tag, object, options, onUpdate, onStart, onCompl
         'startDelay: '.. tostring(options.startDelay or 0),
         'loopDelay: '.. tostring(options.loopDelay or 0),
         'ease: '.. helper.getTweenEaseByString(options.ease),
-        'onUpdate: '.. bcompat.__buildFunction({'twn'}, bcompat.__buildTweenCallback(options.onUpdate, {'"'.. tweenPre .. tag ..'"', '"'.. tostring(object or 'null') ..'"'}) .. (onUpdate or '')),
-        'onStart: '.. bcompat.__buildFunction({'twn'}, bcompat.__buildTweenCallback(options.onStart, {'"'.. tweenPre .. tag ..'"', '"'.. tostring(object or 'null') ..'"'}) .. (onStart or '')),
+        'onUpdate: '.. bcompat.__buildFunction({'twn'}, bcompat.__buildTweenCallback(options.onUpdate, {'"'.. _twnPre .. tag ..'"', '"'.. tostring(object or 'null') ..'"'}) .. (onUpdate or '')),
+        'onStart: '.. bcompat.__buildFunction({'twn'}, bcompat.__buildTweenCallback(options.onStart, {'"'.. _twnPre .. tag ..'"', '"'.. tostring(object or 'null') ..'"'}) .. (onStart or '')),
         'onComplete: '.. bcompat.__buildFunction({'twn'}, ('%s%s'):format(
             (_twnType >= 8) and (version >= '1.0' and 'variables.remove("'.. tag ..'"); ' or 'game.modchartTweens.remove("'.. tag ..'"); ') or '',
-            bcompat.__buildTweenCallback(options.onComplete, {'"'.. tweenPre .. tag ..'"', '"'.. tostring(object or 'null') ..'"'}) .. (onComplete or '')
+            bcompat.__buildTweenCallback(options.onComplete, {'"'.. _twnPre .. tag ..'"', '"'.. tostring(object or 'null') ..'"'}) .. (onComplete or '')
         ))
     )
 end
@@ -39,7 +39,7 @@ function bcompat.startTween(tag, object, values, duration, options)
         local extraFields = {}
         local varsToRemove = {}
         for var, value in pairs(values) do
-            local sepVar = stringSplit(var, '.')
+            local sepVar = helper.stringSplit(var, '.')
             if #sepVar > 1 then
                 local actualVar = sepVar[#sepVar]
                 local parentField = table.concat(helper.resizeTable(sepVar, #sepVar-1), '.')
@@ -66,7 +66,7 @@ function bcompat.startTween(tag, object, values, duration, options)
             return  -- stop the function since there's no "leftover" values
         end
 
-        local _sepObj = stringSplit(object, '.')
+        local _sepObj = helper.stringSplit(object, '.')
         local _object = _sepObj[1]
         table.remove(_sepObj, 1)
         local trailingProp = (#_sepObj >= 1 and '.' or '').. table.concat(_sepObj, '.')

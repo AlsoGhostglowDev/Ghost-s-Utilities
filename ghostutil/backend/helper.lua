@@ -25,7 +25,7 @@ end
 
 function helper.reflect()
     local exists, reflect = pcall(helper.connect, 'reflect')
-    if helper.legacyAvaiable() then
+    if helper.legacyAvailable() then
         if version < '1.0' and not exists and helper.throwError then
             runHaxeCode([[
                 FlxG.stage.window.alert([
@@ -238,15 +238,82 @@ function helper.existsFromTable(tbl, value)
 end
 
 function helper.keyExists(tbl, key)
-    for k in pairs(tbl) do
-        if k == key then return true end
+    if type(tbl) == 'table' then
+        for k in pairs(tbl) do
+            if k == key then return true end
+        end
     end
     return false
 end
 
+-- from Stack Overflow:
+-- https://stackoverflow.com/a/20100401
+function helper.stringSplit(str, del)
+    if not stringSplit then
+        result = {}
+        for match in (str..del):gmatch("([^".. del .."]+)") do
+            table.insert(result, match)
+        end
+        return result
+    else return stringSplit(str, del) end
+end
+
+function helper.ternary(statement, a, b)
+    if statement then 
+        return a
+    else
+        return b
+    end
+end
+
+function helper.bound(c, a, b)
+    return math.max(a, math.min(b, c))
+end
+
+function helper.rawsetDict(t, path, value)
+    local cur = t
+    local split = helper.stringSplit(path, '.')
+
+    for i = 1, #split - 1 do
+        local k = split[i]
+        local next = rawget(cur, k)
+
+        if type(next) ~= "table" then
+            next = {}
+            rawset(cur, k, next)
+        end
+
+        cur = next
+    end
+
+    rawset(cur, split[#split], value)
+end
+
+function helper.rawgetDict(t, path)
+    local cur = t
+    local split = helper.stringSplit(path, '.')
+
+    for i, k in ipairs(split) do
+        if type(cur) ~= "table" then
+            return nil
+        end
+
+        cur = rawget(cur, k)
+        if cur == nil then
+            return nil
+        end
+    end
+
+    return cur
+end
+
 function helper.getDictLength(dict)
     local len = 0
-    for _ in pairs(dict) do len = len + 1 end
+    if type(dict) == 'table' then
+        for _ in pairs(dict) do 
+            len = len + 1 
+        end
+    end
 
     return len
 end
@@ -350,6 +417,7 @@ function helper.concatDict(d1, d2)
     for k, v in pairs(d2) do
         d1[k] = v
     end
+    return d1
 end
 
 function helper.isOfType(self, t)

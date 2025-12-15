@@ -3,18 +3,6 @@ local file = {}
 local helper = require 'ghostutil.backend.helper'
 local debug = require 'ghostutil.debug'
 
--- from Stack Overflow:
--- https://stackoverflow.com/a/20100401
-local function split(str, del)
-    if not stringSplit then
-        result = {}
-        for match in (str..del):gmatch("(.-)"..del) do
-            table.insert(result, match)
-        end
-        return result
-    else return stringSplit(str, del) end
-end
-
 local function open(filePath, mode, fn)
     local file = assert(io.open(filePath, mode))
     local ret = fn(file)
@@ -96,7 +84,7 @@ end
 function file.move(filePath, newPath)
     filePath = filePath:gsub('\\', '/')
     newPath = newPath:gsub('\\', '/')
-    local splPath = split(filePath, '/')
+    local splPath = helper.stringSplit(filePath, '/')
     local file = splPath[#splPath]
     os.rename(filePath, newPath ..'/'.. file)
 end
