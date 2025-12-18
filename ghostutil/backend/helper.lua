@@ -6,18 +6,18 @@ helper.extensions = {}
 helper.initialized = false
 helper.throwError = true
 
+function gcall_helper(fn, args)
+    for name, extension in pairs(helper.extensions) do
+        if extension['callback'] then
+            extension.callback(fn, args)
+        end
+    end
+end
+
 function helper.init()
     if helper.legacyAvailable() then
         if not helper.initialized then
             addHaxeLibrary('Lambda')
-            if version >= '0.7' then
-                createInstance('__gu_hscript__', 'psychlua.HScript', {nil, ''})
-                -- prevent creating a bunch of HScript instances for simple haxe codes
-                runHaxeCode([[
-                    function luaObjectExists(tag:String)
-                        return game.getLuaObject(tag) != null;
-                ]])
-            end
             helper.initialized = true
         end
     end

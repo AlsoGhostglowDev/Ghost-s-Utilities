@@ -37,12 +37,17 @@ modchart.ModFunctions = {
     CUSTOM = math.sin
 }
 
+modchart.ScrollType = {
+    UPSCROLL = 'up',
+    DOWNSCROLL = 'down'
+}
+
 local basicPoint = { x = 0, y = 0}
 local basicWiggleMod = {
     enabled = false,
     amplitude = { x = 1, y = 1 },
     phase = copyFrom(basicPoint),
-    distance = copyFrom(basicPoint),
+    magnitude = copyFrom(basicPoint),
     offset = copyFrom(basicPoint),
     func = { 
         x = modchart.ModFunctions.SINE,
@@ -82,6 +87,7 @@ local basicBrakeMod = {
 
 local basicStrumMods = {
     enabled = false,
+    scroll = modchart.ScrollType.UPSCROLL,
     position = copyFrom(basicPoint),
     offset = copyFrom(basicPoint),
     wiggleMod = copyFrom(basicWiggleMod),
@@ -215,9 +221,12 @@ function modchart.tweenModifier(tag, index, modifier, axis, value, duration, eas
 end
 
 function modchart.cancelTween(tag)
+    local foundTween = false
     if helper.keyExists(modchart.trackedTweens, tag) then
         cancelTween(tag)
         modchart.trackedTweens[tag] = nil
+
+        foundTween = true
     end
     
     if helper.keyExists(modchart.trackedScrollTweens, tag) then
@@ -227,6 +236,12 @@ function modchart.cancelTween(tag)
         cancelTween(tag ..'_scrollSpeed')
         cancelTween(tag ..'out_scrollSpeed')
         modchart.trackedScrollTweens[tag] = nil
+
+        foundTween = true
+    end
+
+    if not foundTween then
+        debug.error('unrecog_el', {tag, 'modchart.trackedTweens and modchart.trackedScrollTweens'}, 'modchart.cancelTween')
     end
 end
 
@@ -249,8 +264,8 @@ local function wiggleMod(wiggleData, dt)
         wiggleData.phase.x = wiggleData.phase.x + wiggleData.amplitude.x * dt
         wiggleData.phase.y = wiggleData.phase.y + wiggleData.amplitude.y * dt
         return {
-            x = wiggleData.func.x( wiggleData.phase.x + wiggleData.offset.x ) * wiggleData.distance.x,
-            y = wiggleData.func.y( wiggleData.phase.y + wiggleData.offset.y ) * wiggleData.distance.y
+            x = wiggleData.func.x( wiggleData.phase.x + wiggleData.offset.x ) * wiggleData.magnitude.x,
+            y = wiggleData.func.y( wiggleData.phase.y + wiggleData.offset.y ) * wiggleData.magnitude.y
         }
     else return copyFrom(basicPoint) end
 end
@@ -281,6 +296,10 @@ function getMultSpeed(index)
     return (getPropertyFromGroup('notes', i, 'extraData.multSpeed', true) or 1)
 end
 
+function getMultAlpha(index)
+    return (getPropertyFromGroup('notes', i, 'extraData.multAlpha', 1) or 1)
+end
+
 function modchart.updateNoteModifiers(elapsed)
     for i = 0, getProperty('notes.length')-1 do
         local dataOffset = getPropertyFromGroup('notes', i, 'mustPress') and 5 or 1
@@ -288,26 +307,38 @@ function modchart.updateNoteModifiers(elapsed)
         local stepsLeft = (getPropertyFromGroup('notes', i, 'strumTime') - getSongPosition()) / stepCrochet
         
         setPropertyFromGroup('notes', i, 'multSpeed', getMultSpeed(i) * strumData.speed)
+        setPropertyFromGroup('notes', i, 'multSpeed', getMultAlpha(i))
 
         if strumData.suddenMod.enabled then 
             local suddenMod = strumData.suddenMod
+
             if stepsLeft <= suddenMod.startStep then
-                local targetAlpha = suddenMod.startAlpha + (((suddenMod.startStep - stepsLeft) / suddenMod.startStep) * suddenMod.endAlpha * (1.5 - suddenMod.startAlpha))
-                setPropertyFromGroup('notes', i, 'multAlpha', targetAlpha)
+                local progress = helper.bound((suddenMod.startStep - stepsLeft) / suddenMod.startStep, 0, 1)
+                local targetAlpha = suddenMod.startAlpha + (progress * suddenMod.endAlpha * (1.5 - suddenMod.startAlpha))
+
+                local minAlpha = math.min(suddenMod.startAlpha, suddenMod.endAlpha)
+                local maxAlpha = math.max(suddenMod.startAlpha, suddenMod.endAlpha)
+                setPropertyFromGroup('notes', i, 'multAlpha', helper.bound(targetAlpha, minAlpha, maxAlpha) * getMultAlpha(i))
             else
-                setPropertyFromGroup('notes', i, 'multAlpha', suddenMod.startAlpha)
+                setPropertyFromGroup('notes', i, 'multAlpha', suddenMod.startAlpha * getMultAlpha(i))
             end
         end
         
         if strumData.hiddenMod.enabled then
             local hiddenMod = strumData.hiddenMod
-            if stepsLeft <= hiddenMod.startStep then
-                local targetAlpha = hiddenMod.startAlpha
-                                    + (hiddenMod.endAlpha - hiddenMod.startAlpha)
-                                    * (1 - (stepsLeft - (hiddenMod.startStep / 1.25)) / hiddenMod.startStep)
-                setPropertyFromGroup('notes', i, 'multAlpha', targetAlpha)
+            local startStep = hiddenMod.startStep
+
+            if startStep <= 0 then
+                setPropertyFromGroup('notes', i, 'multAlpha', (stepsLeft <= 0) and hiddenMod.endAlpha or hiddenMod.startAlpha)
+            elseif stepsLeft <= startStep then
+                local progress = helper.bound(1 - (stepsLeft - (startStep / 1.25)) / startStep, 0, 1)
+                local targetAlpha = hiddenMod.startAlpha + (hiddenMod.endAlpha - hiddenMod.startAlpha) * progress
+
+                local minAlpha = math.min(hiddenMod.startAlpha, hiddenMod.endAlpha)
+                local maxAlpha = math.max(hiddenMod.startAlpha, hiddenMod.endAlpha)
+                setPropertyFromGroup('notes', i, 'multAlpha', helper.bound(targetAlpha, minAlpha, maxAlpha) * getMultAlpha(i))
             else
-                setPropertyFromGroup('notes', i, 'multAlpha', hiddenMod.startAlpha)
+                setPropertyFromGroup('notes', i, 'multAlpha', hiddenMod.startAlpha * getMultAlpha(i))
             end
         end
 
@@ -315,7 +346,7 @@ function modchart.updateNoteModifiers(elapsed)
             local boostMod = strumData.boostMod
             if (stepsLeft / 1.25) <= boostMod.startStep then
                 local targetSpeed = 1 + (boostMod.speed - 1)
-                                    * helper.bound(1 - stepsLeft / (boostMod.startStep * 1.25), 0, 1)
+                                    * helper.bound(1 - stepsLeft / (boostMod.startStep * 1.25), 0, boostMod.speed)
                 setPropertyFromGroup('notes', i, 'multSpeed', getMultSpeed(i) * targetSpeed * strumData.speed)
             end
         end
@@ -324,7 +355,7 @@ function modchart.updateNoteModifiers(elapsed)
             local brakeMod = strumData.brakeMod
             if stepsLeft <= brakeMod.startStep then
                 local targetSpeed = 1 + (brakeMod.speed - 1)
-                                    * helper.bound(1 - stepsLeft / (brakeMod.startStep * 1.25), 0, 1)
+                                    * helper.bound(1 - stepsLeft / (brakeMod.startStep * 1.25), brakeMod.speed, strumData.speed)
                 setPropertyFromGroup('notes', i, 'multSpeed', getMultSpeed(i) * targetSpeed * strumData.speed)
             end
         end
@@ -368,6 +399,9 @@ function modchart.tweenScroll(tag, isDownscroll, index, duration, ease, moveNote
 
         modchart.trackedScrollTweens[tag] = { i = index, downscroll = isDownscroll }
     end
+    if tag == nil then debug.error('nil_param', {'tag'}, 'modchart.tweenScroll') end
+    if isDownscroll == nil then debug.error('nil_param', {'isDownscroll'}, 'modchart.tweenScroll') end
+    if index == nil then debug.error('nil_param', {'index'}, 'modchart.tweenScroll') end
 end
 
 function gcall_modchart(fn, args)
