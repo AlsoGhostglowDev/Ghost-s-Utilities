@@ -55,7 +55,7 @@ GhostUtil also adds the capability to make and add **community extensions** (as 
 <img width="1200" height="300" alt="image" src="https://github.com/user-attachments/assets/2c767e14-eebe-4a42-9f95-b4e0cfdfeb2f" />
 
 <b>2.</b> Afterwards, drag-n-drop the `callbackhandler.lua` script into `mods/scripts`.
-<img width="1200" height="300" alt="image" src="https://github.com/user-attachments/assets/37546f6c-f2e4-449c-b9c4-ecdc32680df2" />
+<img width="1200" height="300" alt="image" src="https://github.com/user-attachments/assets/0ad56355-01f8-4c60-bf54-b019feee5a2c" />
 
 <b>3.</b> Next, to actually use GhostUtil inside your scripts, simply import one of the module using the `require` function.
 > ```lua
@@ -109,3 +109,4 @@ Licensed under the <a href='https://opensource.org/license/mit'>MIT License</a>.
 </sub></i>
 
 </div>
+
