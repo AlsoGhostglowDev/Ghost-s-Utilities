@@ -1,6 +1,6 @@
 <img width="1200" height="300" alt="image" src="https://github.com/user-attachments/assets/eff74246-5989-4222-83e6-0429bf6cc746" />
 
-**Ghost's Utilities** *(GhostUtil)* is a large Lua library full of modules for all-in-one use containing functions of which you may find useful for executing common tasks in Psych Engine. <br>
+**Ghost's Utilities** *(GhostUtil for short)* is a large Lua library full of modules for all-in-one use, containing functions of which you may find useful for executing common tasks in Psych Engine. <br>
 
 ### Backwards Compatibility
 <img width="1200" height="100" alt="image" src="https://github.com/user-attachments/assets/09304622-1372-48cc-bcef-243d146857fb" />
@@ -10,12 +10,12 @@ GhostUtil adds support to backwards compatibility by adding newer reflect functi
 ### Transitioning from 0.6.3 to 0.7.3
 <img width="1200" height="100" alt="image" src="https://github.com/user-attachments/assets/ccb80ee0-ddcc-42d5-8661-87c180e2c569" />
 
-The library is equipped with the `outdate-handler.lua` module of which could automatically handle the **class pathing between 0.6.3 and 0.7.0 huge overhaul**. Added support is for functions like `addHaxeLibrary`, `setPropertyFromClass` and `getPropertyFromClass`. Although, it is only limited towards the changes made in the Psych Engine's Source Code and nothing from other changes from Flixel and other Haxelibs.<br>
+The library is equipped with the `outdate-handler.lua` module of which could automatically handle the **class pathing between 0.6.3 and the 0.7.0 overhaul update**. Added support is for functions like `addHaxeLibrary`, `setPropertyFromClass` and `getPropertyFromClass`. Although, it is only limited towards the changes made in Psych Engine's Source Code and nothing from changes in other Haxelibs, like Flixel.<br>
 
 ### Other Usage
 <img width="1200" height="100" alt="image" src="https://github.com/user-attachments/assets/35f7928c-f9a7-4dd6-ac00-75969dd2d0ca" />
 
-Additionally, GhostUtil has easier methods on **adding shaders to cameras** (<kbd>shader.addCameraFilter</kbd>), manipulating the **game's application** with simple tweens (<kbd>window.startTween</kbd>) and more! There's also a simple-to-use **semi-advanced modcharting tool** for you chaotic modcharters out there who uses `Lua`.<br>
+Additionally, GhostUtil has easier methods on **adding shaders to cameras** (<kbd>shader.addCameraFilter</kbd>), manipulating the **game's application** with simple tweens (<kbd>window.startTween</kbd>), and more! There's also a simple-to-use **semi-advanced modcharting tool** for you chaotic modcharters out there who uses `Lua`.<br>
 
 GhostUtil also adds the capability to make and add **community extensions** (as seen for GhostUtil's `reflect.lua` extension) for others to **integrate their own library into GhostUtil's environment**.
 
@@ -67,7 +67,7 @@ GhostUtil also adds the capability to make and add **community extensions** (as 
 ## How to Use
 
 > [!CAUTION]
-> Some modules may only be available after `onCreate` is called in Psych Engine **0.6.3**
+> In Psych Engine **0.6.3**, some modules may only be available after `onCreate` is called
 
 <b>1.</b> Import one of GhostUtil's module.
 > ```lua
@@ -101,12 +101,11 @@ If any bugs is found within the utility, make sure to report it in the Github Is
 *Note that I will be closing issues that's caused in the aforementioned incompatible Psych Engine versions.*
 
 ---
-<div style="text-align:center">
+<p align="center">
 <sub><i>
 a Lua Library made by GhostglowDev; for <a href='https://github.com/ShadowMario/FNF-PsychEngine'>Psych Engine</a> <br>
 © 2025 <a href='https://github.com/AlsoGhostglowDev'>GhostglowDev</a> — <a href='https://github.com/AlsoGhostglowDev/Ghost-s-Utilities'>Ghost's Utilities</a> <br>
 Licensed under the <a href='https://opensource.org/license/mit'>MIT License</a>.
 </sub></i>
-
-</div>
+</p>
 
