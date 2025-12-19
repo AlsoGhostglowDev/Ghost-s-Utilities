@@ -100,6 +100,14 @@ If any bugs is found within the utility, make sure to report it in the Github Is
 
 *Note that I will be closing issues that's caused in the aforementioned incompatible Psych Engine versions.*
 
+### Support Me:
+Maybe you thought my work was cool, and wanted to support me in some kind of other way? <br>
+Well now you can with **Ko-fi**! <br>
+
+[<img width="168" height="89" alt="Support Me!" src="https://github.com/user-attachments/assets/8ad30b91-00a7-48a9-99e8-b79c9abfac6b" />](https://ko-fi.com/ghostglowdev)
+
+If you ever donated or supported me, I want to say all my thanks to you guys who supports me. I genuinely can't thank you guys enough for the support you all give for my tiny projects. Thank you again :)
+
 ---
 <p align="center">
 <sub><i>
@@ -108,4 +116,5 @@ a Lua Library made by GhostglowDev; for <a href='https://github.com/ShadowMario/
 Licensed under the <a href='https://opensource.org/license/mit'>MIT License</a>.
 </sub></i>
 </p>
+
 
