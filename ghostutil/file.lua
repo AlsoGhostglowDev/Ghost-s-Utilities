@@ -27,7 +27,7 @@ function file.append(filePath, content)
         end)
         return
     end
-    saveFile(filePath, file.read(filePath) .. content)
+    saveFile(filePath, file.read(filePath) .. content, true)
 end
 
 function file.read(filePath)
@@ -73,7 +73,7 @@ function file.readDirectory(filePath)
                 local dir = helper.callMethodFromClass('sys.FileSystem', 'readDirectory', {filePath})
                 return dir
             end
-            debug.warn('', {}, 'file.readDirectory', 'Result might not be accurate,\nplease run this in an appropriate callback.')
+            debug.warn('', {}, 'file.readDirectory', 'This function is unavailable outside a function.\nPlease run this in an appropriate callback')
             return
         end
         return directoryFileList(filePath, true) 

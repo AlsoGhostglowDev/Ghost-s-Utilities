@@ -1,15 +1,41 @@
 luaDebugMode = true
 
+--[[
+    GHOSTUTIL's CALLBACK HANDLER
+    
+    This script is meant to handle GhostUtil's modules' callbacks.
+    The "require" function cancels GhostUtil's Psych Callbacks, so with this script,
+    we can call multiple module's callbacks without issues. 
+]]
+
+local hasPre = version > '0.7.2' 
 local callbacks = {
+    -- Psych Engine callbacks
     {'onCreate', 0, true}, {'onUpdate', 1, true},
-    {'goodNoteHit', 4},    {'opponentNoteHit', 4},
-    {'noteMiss', 4},       {'onGhostTap', 1},
-    {'onStartCountdown'},  {'onCountdownStarted'}, {'onCountdownTick', 1},   
+    {'onStartCountdown'},  {'onCountdownStarted'}, {'onCountdownTick', 1},
+    {'onMoveCamera', 1}, 
+    {'onStartCountdown'},  {'onCountdownStarted'}, {'onCountdownTick', 1}, 
     {'onSectionHit'},      {'onBeatHit'},          {'onStepHit'},
     {'onSongStart'},       {'onEndSong'},
-    {'onDestroy'}
+    {'onDestroy'},
+
+    {'onSpawnNote', 5},
+    {'goodNoteHit', 4, false, hasPre},      {'opponentNoteHit', 4, false, hasPre}, {'onUpdateScore', 1, false, true}, 
+    {'noteMiss', 4}, {'noteMissPress', 1}, {'onGhostTap', 1},
+    {'preUpdateScore', 1}, {'onRecalculateRating'},
+    
+    {'onPause'},    {'onResume'},
+    {'onGameOver'}, {'onGameOverStart'}, {'onGameOverConfirm', 1},
+
+    {'onEvent', 4}, {'onEventPushed', 4},
+    {'onTweenCompleted', 2}, {'onTimerCompleted', 3}, {'onSoundFinished', 1},
+
+    {'onKeyPress', 1, false, hasPre},      {'onKeyRelease', 1, false, hasPre}, 
+
+    -- GhostUtil callbacks
+    {'onNumberTween', 2}
 }
-local modules = {'util', 'modchart'}
+local modules = {'helper', 'util', 'modchart', 'window'}
 
 local function arg(amount)
     if amount <= 0 then return ' ' end

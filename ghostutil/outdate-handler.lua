@@ -55,7 +55,7 @@ function outdate.addHaxeLibrary(libName, pkg, legacy, shouldWarn)
     local package = table.concat(helper.resizeTable(splClass, #splClass-1), '.')
 
     debugPrint('added library: Class: '.. class .. ' | Package: '.. package)
-    addHaxeLibrary(class, package)
+    helper.addHaxeLibrary(class, package)
 end
 
 function outdate.setPropertyFromClass(class, prop, value, allowMaps, allowInstances, legacy)

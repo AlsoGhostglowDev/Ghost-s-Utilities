@@ -8,12 +8,18 @@ local function printError(func, message)
     end
 end
 
+local function _addHaxeLibrary(library, package)
+    luaDeprecatedWarnings = false
+    addHaxeLibrary(library, package)
+    luaDeprecatedWarnings = true
+end
+
 web.initialized = false
 function web.init()
     if not web.initialized then
-        addHaxeLibrary('Http', 'sys')
+        _addHaxeLibrary('Http', 'sys')
         if version < '0.7' then 
-            addHaxeLibrary('CoolUtil')
+            _addHaxeLibrary('CoolUtil')
         end
         web.initialized = true
     end
@@ -55,17 +61,18 @@ end
 web.getDataFromWeb = web.getDataFromUrl
 web.getDataFromWebsite = web.getDataFromUrl
 
-function web.loadBrowser(website)
+function web.loadBrowser(url)
     web.init()
-    if website ~= nil then
+    if url ~= nil then
         if version > '0.7' then
-            return callMethodFromClass('backend.CoolUtil', 'browserLoad', {website})
+            return callMethodFromClass('backend.CoolUtil', 'browserLoad', {url})
         else
-		    return runHaxeCode('CoolUtil.browserLoad('.. website ..');')
+		    return runHaxeCode('return CoolUtil.browserLoad('.. url ..');')
         end
 	else
 		printError('web.loadBrowser:1', 'bad argument #1 (value expected)')
 	end
 end
+web.loadURL = web.loadBrowser
 
 return web

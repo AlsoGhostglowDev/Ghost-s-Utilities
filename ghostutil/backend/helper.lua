@@ -17,7 +17,9 @@ end
 function helper.init()
     if helper.legacyAvailable() then
         if not helper.initialized then
-            addHaxeLibrary('Lambda')
+            debug.warnOutdate()
+            
+            helper.addHaxeLibrary('Lambda')
             helper.initialized = true
         end
     end
@@ -32,7 +34,7 @@ function helper.reflect()
                     'COMPATIBILITY ERROR!', 
                     '',
                     "You're currently using Psych Engine version ]].. version ..[[!", 
-                    "As of version 3.0.0, Ghost's Utilities no longer supports this version of Psych Engine.",
+                    "As of version 3.0, Ghost's Utilities no longer supports this version of Psych Engine.",
                     '',
                     'Either update to a later supported version (1.0 or higher), or install the "reflect" extension for a compatibility bridge.',
                     'It is recommended that you update to the latest version for the best and more optimized experience.'
@@ -46,7 +48,7 @@ end
 
 function helper.legacyAvailable()
     if version < '0.7' then
-        if runHaxeCode == nil then 
+        if makeLuaSprite == nil then 
             return false 
         end
     end
@@ -74,11 +76,11 @@ function helper.instanceArg(instance, class)
 end
 
 function helper.callMethod(method, args)
-    return resolveReflect('callMethod', callMethod, {method, args}, '0.7.2h')
+    return resolveReflect('callMethod', callMethod, {method, args}, '1.0')
 end
 
 function helper.callMethodFromClass(class, method, args)
-    return resolveReflect('callMethodFromClass', callMethodFromClass, {class, method, args}, '0.7.2h')
+    return resolveReflect('callMethodFromClass', callMethodFromClass, {class, method, args}, '1.0')
 end
 
 function helper.createInstance(tag, className, args)
@@ -107,23 +109,26 @@ function helper.connect(name)
         local exists, extension = pcall(require, 'ghostutil.extensions.'.. name)
         if exists then 
             helper.extensions[name] = extension 
-        else debug.error('EXTENSION ERROR', 'Failed to load GhostUtil extension: "'.. name ..'"') end
+        else 
+            debug.error('EXTENSION ERROR', 'Failed to load GhostUtil extension: "'.. name ..'"') 
+            return nil
+        end
     end
     return helper.extensions[name]
 end
 
-function helper.getCameraFromString(camera)
-    camera = camera:lower()
+function helper.getCameraFromString(_camera)
+    camera = _camera:lower()
     
         if camera:find('other')          then return 'camOther'
     elseif camera:find('hud')            then return 'camHUD' 
-    elseif helper.variableExists(camera) then return camera
+    elseif helper.variableExists(_camera) then return _camera
     else   return 'camGame'
     end
 end
 
-function helper.getType(result)
-    return type(result) == 'table' and (helper.isDict(result) and 'dictionary' or 'table') or type(result)
+function helper.getType(result, structOverDict)
+    return type(result) == 'table' and (helper.isDict(result) and (structOverDict and 'dictionary' or 'struct') or 'table') or type(result)
 end
 
 function helper.serialize(value, t)
@@ -135,7 +140,7 @@ function helper.serialize(value, t)
         if type(value) == 'table' then
             local arr = '['
             for i, v in ipairs(value) do
-                arr = arr .. helper.serialize(v, helper.getType(v)) .. (i == #value and '' or ', ')
+                arr = arr .. helper.serialize(v, helper.getType(v, true)) .. (i == #value and '' or ', ')
             end
 
             return arr ..']'
@@ -146,7 +151,7 @@ function helper.serialize(value, t)
             local i = 0
             for k, v in pairs(value) do
                 i = i + 1
-                map = map .. helper.serialize(k, type(k)) .. ' => ' .. helper.serialize(v, helper.getType(v)) .. (i == helper.getDictLength(value) and '' or ', ')
+                map = map .. helper.serialize(k, type(k)) .. ' => ' .. helper.serialize(v, helper.getType(v, true)) .. (i == helper.getDictLength(value) and '' or ', ')
             end
             return map ..']'
         end
@@ -156,7 +161,7 @@ function helper.serialize(value, t)
             local i = 0
             for k, v in pairs(value) do
                 i = i + 1
-                struct = struct .. k .. ': ' .. helper.serialize(v, helper.getType(v)) .. (i == helper.getDictLength(value) and '' or ', ')
+                struct = struct .. k .. ': ' .. helper.serialize(v, helper.getType(v, true)) .. (i == helper.getDictLength(value) and '' or ', ')
             end
             return struct ..'}'
         end
@@ -172,9 +177,15 @@ function helper.serialize(value, t)
     return value
 end
 
+function helper.addHaxeLibrary(library, package)
+    luaDeprecatedWarnings = false
+    addHaxeLibrary(library, package)
+    luaDeprecatedWarnings = true
+end
+
 function helper.hgetKeys(map)
     helper.init()
-    return runHaxeCode('return Lambda.array({ iterator: '.. helper.parseObject(map) ..'.keys });')
+    return runHaxeCode('return Lambda.array({ iterator: '.. helper.parseObject(map) ..'.keys });') or { }
 end
 
 function helper.getKeys(dict)
@@ -227,7 +238,7 @@ function helper.findKey(tbl, value)
     for k, v in pairs(tbl) do
         if v == value then return k end
     end
-    return 0
+    return nil
 end
 
 function helper.existsFromTable(tbl, value)
@@ -334,6 +345,15 @@ function helper.fillTable(tbl, value, length)
     return tbl
 end
 
+function helper.resolveNilInTable(tbl, fallbackValue)
+    for i, v in ipairs(tbl) do
+        if type(v) == nil then 
+            tbl[i] = fallbackValue 
+        end
+    end
+    return tbl
+end
+
 function helper.resizeTable(tbl, length)
     while #tbl > length do
         table.remove(tbl, #tbl)
@@ -413,8 +433,12 @@ function helper.concat(t1, t2)
     return t1
 end
 
-function helper.concatDict(d1, d2)
+function helper.concatDict(d1, d2, override)
+    override = helper.resolveDefaultValue(override, true)
     for k, v in pairs(d2) do
+        if d1[k] ~= nil and not override then
+            return
+        end
         d1[k] = v
     end
     return d1

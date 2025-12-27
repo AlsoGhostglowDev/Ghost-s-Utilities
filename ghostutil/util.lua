@@ -9,13 +9,13 @@ local dkjson = require 'ghostutil.backend.dkjson'
 util.initialized = false
 function util.init()
     if not util.initialized then
-        addHaxeLibrary('FlxGradient', 'flixel.util')
-        addHaxeLibrary('FlxTextFormatMarkerPair', 'flixel.text')
-        addHaxeLibrary('FlxTextFormat', 'flixel.text')
-        addHaxeLibrary('FlxText', 'flixel.text')
-        addHaxeLibrary('System', 'openfl.system')
-        addHaxeLibrary('Type')
-        addHaxeLibrary('Reflect')
+        helper.addHaxeLibrary('FlxGradient', 'flixel.util')
+        helper.addHaxeLibrary('FlxTextFormatMarkerPair', 'flixel.text')
+        helper.addHaxeLibrary('FlxTextFormat', 'flixel.text')
+        helper.addHaxeLibrary('FlxText', 'flixel.text')
+        helper.addHaxeLibrary('System', 'openfl.system')
+        helper.addHaxeLibrary('Type')
+        helper.addHaxeLibrary('Reflect')
 
         util.initialized = true
     end
@@ -35,6 +35,30 @@ function util.doTweenNumber(tag, from, to, duration, options)
         return
     end
     debug.error('nil_param', {'tag'}, 'util.doTweenNumber:1')
+end
+
+function util.doTweenScale(tag, var, values, duration, ease)
+    values = helper.fillTable(values, 0, 2)
+    bcompat.startTween(tag, var ..'.scale', {x = values[0], y = values[1]}, duration, {
+        ease = ease,
+        onComplete = 'onTweenCompleted'
+    })
+end
+
+function util.doTweenPosition(tag, var, values, duration, ease)
+    values = helper.fillTable(values, 0, 2)
+    bcompat.startTween(tag, var, {x = values[0], y = values[1]}, duration, {
+        ease = ease,
+        onComplete = 'onTweenCompleted'
+    })
+end
+
+function util.pauseTween(tag)
+    helper.callMethod((version >= '1.0' and '' or 'modchartTweens.').. tag ..'.pause', {''})
+end
+
+function util.resumeTween(tag)
+    helper.callMethod((version >= '1.0' and '' or 'modchartTweens.').. tag ..'.resume', {''})
 end
 
 function util.toboolean(value)
@@ -79,24 +103,8 @@ end
 util.isTable = util.istable
 
 function util.switch(case, cases)
-    if (cases[case]) then cases[case]()
-    elseif (cases["default"]) then cases["default"]() end
-end
-
-function util.doTweenScale(tag, var, values, duration, ease)
-    values = helper.fillTable(values, 0, 2)
-    bcompat.startTween(tag, var ..'.scale', {x = values[0], y = values[1]}, duration, {
-        ease = ease,
-        onComplete = 'onTweenCompleted'
-    })
-end
-
-function util.doTweenPosition(tag, var, values, duration, ease)
-    values = helper.fillTable(values, 0, 2)
-    bcompat.startTween(tag, var, {x = values[0], y = values[1]}, duration, {
-        ease = ease,
-        onComplete = 'onTweenCompleted'
-    })
+    if (cases[case]) then return cases[case]()
+    elseif (cases["default"]) then return cases["default"]() end
 end
 
 function util.makeGradient(sprite, width, height, colors, chunkSize, rotation, interpolate)
@@ -166,38 +174,6 @@ function util.getHealthColor(character)
     end
     debug.error('wrong_type', {'bf, dad or gf', character}, 'util.getHealthColor:1')
     return nil
-end
-
-function util.setHealthBarColors(left, right)
-    if left ~= nil and right ~= nil then
-        if version >= '0.7' then setHealthBarColors(left, right) else 
-            left = type(left) == 'string' and tonumber((stringStartsWith(col, '0x') and '' or '0x').. left) or left
-            right = type(right) == 'string' and tonumber((stringStartsWith(col, '0x') and '' or '0x').. right) or right
-            left = color.rgbToARGB(left)
-            right = color.rgbToARGB(right)
-            helper.callMethod('healthBar.createFilledBar', {left, right})
-        end
-        return
-    end
-    local _missingParam = (left == nil and right == nil) and 'left & right:1&2' or (left == nil and 'left:1' or 'right:2')
-    local _sepMissing = helper.stringSplit(_missingParam, ':')
-    debug.error('nil_param', { _sepMissing[1] }, 'util.setHealthBarColors'.. _sepMissing[2])
-end
-
-function util.setTimeBarColors(left, right)
-    if left ~= nil and right ~= nil then
-        if version >= '0.7' then setTimeBarColors(left, right) else 
-            left = type(left) == 'string' and tonumber((stringStartsWith(col, '0x') and '' or '0x').. left) or left
-            right = type(right) == 'string' and tonumber((stringStartsWith(col, '0x') and '' or '0x').. right) or right
-            left = color.rgbToARGB(left)
-            right = color.rgbToARGB(right)
-            helper.callMethod('timeBar.createFilledBar', {left, right})
-        end
-        return
-    end
-    local _missingParam = (left == nil and right == nil) and 'left & right:1&2' or (left == nil and 'left:1' or 'right:2')
-    local _sepMissing = helper.stringSplit(_missingParam, ':')
-    debug.error('nil_param', { _sepMissing[1] }, 'util.setTimeBarColors'.. _sepMissing[2])
 end
 
 function util.getFps()

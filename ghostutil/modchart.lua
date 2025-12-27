@@ -45,7 +45,7 @@ modchart.ScrollType = {
 local basicPoint = { x = 0, y = 0}
 local basicWiggleMod = {
     enabled = false,
-    amplitude = { x = 1, y = 1 },
+    frequency = { x = 1, y = 1 },
     phase = copyFrom(basicPoint),
     magnitude = copyFrom(basicPoint),
     offset = copyFrom(basicPoint),
@@ -56,7 +56,7 @@ local basicWiggleMod = {
 }
 local basicShakeMod = {
     enabled = false,
-    distance = copyFrom(basicPoint),
+    magnitude = copyFrom(basicPoint),
     func = {
         x = randomFloat,
         y = randomFloat
@@ -102,6 +102,7 @@ local basicStrumMods = {
 
 local modAliases = { 
     enabled = 'enabled',
+    scroll = 'scroll',
     pos = 'position',
     position = 'position',
     offset = 'offset',
@@ -183,7 +184,7 @@ function modchart.setModifier(index, data, value, axis)
         return
     end
     debug.error('wrong_type', {'0...7', index}, 'modchart.setModifier')
-    return nil
+    return
 end
 
 function modchart.setDefaultOffsets()
@@ -217,7 +218,7 @@ function modchart.tweenModifier(tag, index, modifier, axis, value, duration, eas
         ease = ease,
         onComplete = '__removeTrackedTween'
     })
-    modchart.trackedTweens[bcompat.__getTweenPrefix() .. tag] = {index = index, mod = modifier, axis = axis:lower()}
+    modchart.trackedTweens[tag] = {index = index, mod = modifier, axis = axis:lower()}
 end
 
 function modchart.cancelTween(tag)
@@ -245,6 +246,12 @@ function modchart.cancelTween(tag)
     end
 end
 
+function modchart.resetStrumModifiers(index)
+    if index <= 8 then
+        modchart.strums[index + 1] = copyFrom(modchart.defaultStrumData[index])
+    end
+end
+
 function modchart.resetModifiers()
     for i, strumData in ipairs(modchart.strums) do
         modchart.strums[i] = copyFrom(modchart.defaultStrumData[i])
@@ -259,10 +266,14 @@ function modchart.resetTime()
     modchart.setTime(0)
 end
 
+function toSpeed(freq)
+    return 2 * math.pi * freq
+end
+
 local function wiggleMod(wiggleData, dt)
     if wiggleData.enabled then
-        wiggleData.phase.x = wiggleData.phase.x + wiggleData.amplitude.x * dt
-        wiggleData.phase.y = wiggleData.phase.y + wiggleData.amplitude.y * dt
+        wiggleData.phase.x = wiggleData.phase.x + toSpeed(wiggleData.frequency.x) * dt
+        wiggleData.phase.y = wiggleData.phase.y + toSpeed(wiggleData.frequency.y) * dt
         return {
             x = wiggleData.func.x( wiggleData.phase.x + wiggleData.offset.x ) * wiggleData.magnitude.x,
             y = wiggleData.func.y( wiggleData.phase.y + wiggleData.offset.y ) * wiggleData.magnitude.y
@@ -273,8 +284,8 @@ end
 local function shakeMod(shakeData, dt)
     if shakeData.enabled then 
         return {
-            x = shakeData.func.x( shakeData.distance.x, -shakeData.distance.x ),
-            y = shakeData.func.y( shakeData.distance.y, -shakeData.distance.y ),
+            x = shakeData.func.x( shakeData.magnitude.x, -shakeData.magnitude.x ),
+            y = shakeData.func.y( shakeData.magnitude.y, -shakeData.magnitude.y ),
         }
     else return copyFrom(basicPoint) end
 end
@@ -307,7 +318,7 @@ function modchart.updateNoteModifiers(elapsed)
         local stepsLeft = (getPropertyFromGroup('notes', i, 'strumTime') - getSongPosition()) / stepCrochet
         
         setPropertyFromGroup('notes', i, 'multSpeed', getMultSpeed(i) * strumData.speed)
-        setPropertyFromGroup('notes', i, 'multSpeed', getMultAlpha(i))
+        setPropertyFromGroup('notes', i, 'multAlpha', getMultAlpha(i))
 
         if strumData.suddenMod.enabled then 
             local suddenMod = strumData.suddenMod
@@ -346,7 +357,7 @@ function modchart.updateNoteModifiers(elapsed)
             local boostMod = strumData.boostMod
             if (stepsLeft / 1.25) <= boostMod.startStep then
                 local targetSpeed = 1 + (boostMod.speed - 1)
-                                    * helper.bound(1 - stepsLeft / (boostMod.startStep * 1.25), 0, boostMod.speed)
+                                    * (1 - stepsLeft / (boostMod.startStep * 1.25))
                 setPropertyFromGroup('notes', i, 'multSpeed', getMultSpeed(i) * targetSpeed * strumData.speed)
             end
         end
@@ -355,7 +366,7 @@ function modchart.updateNoteModifiers(elapsed)
             local brakeMod = strumData.brakeMod
             if stepsLeft <= brakeMod.startStep then
                 local targetSpeed = 1 + (brakeMod.speed - 1)
-                                    * helper.bound(1 - stepsLeft / (brakeMod.startStep * 1.25), brakeMod.speed, strumData.speed)
+                                    * (1 - stepsLeft / (brakeMod.startStep * 1.25))
                 setPropertyFromGroup('notes', i, 'multSpeed', getMultSpeed(i) * targetSpeed * strumData.speed)
             end
         end
@@ -369,7 +380,7 @@ function modchart.tweenScroll(tag, isDownscroll, index, duration, ease, moveNote
         duration = duration or 1
 
         if moveNotes then
-            modchart.tweenModifier(tag, index, 'position', 'y', isDownscroll and 560 or 50, duration, ease)
+            modchart.tweenModifier(tag, index, 'position', 'y', isDownscroll and 570 or 50, duration, ease)
         end
 
         local function getEaseName(ease) 
@@ -397,7 +408,8 @@ function modchart.tweenScroll(tag, isDownscroll, index, duration, ease, moveNote
             ease = getEaseName(ease) ..'Out' 
         })
 
-        modchart.trackedScrollTweens[tag] = { i = index, downscroll = isDownscroll }
+        modchart.trackedScrollTweens[tag] = { index = index, downscroll = isDownscroll }
+        return
     end
     if tag == nil then debug.error('nil_param', {'tag'}, 'modchart.tweenScroll') end
     if isDownscroll == nil then debug.error('nil_param', {'isDownscroll'}, 'modchart.tweenScroll') end
@@ -422,6 +434,10 @@ function gcall_modchart(fn, args)
     if fn == 'onCreatePost' then
         math.randomseed(os.time())
         modchart.setDefaultOffsets()
+
+        for i = 0, getProperty('strumLineNotes.length')-1 do
+            modchart.setModifier(i, 'scroll', getPropertyFromGroup('strumLineNotes', i, 'downScroll') and modchart.ScrollType.DOWNSCROLL or modchart.ScrollType.UPSCROLL)
+        end
     end
 
     if fn == 'onNumberTween' then
@@ -438,7 +454,7 @@ function gcall_modchart(fn, args)
 
         if stringEndsWith(tag, '_scrollSpeed') then 
             if num == 0 then return end
-            local index = modchart.trackedScrollTweens[tag:gsub('out_scrollSpeed', ''):gsub('_scrollSpeed', '')].i
+            local index = modchart.trackedScrollTweens[tag:gsub('out_scrollSpeed', ''):gsub('_scrollSpeed', '')].index
             modchart.strums[index+1].speed = num
         end
     end
@@ -454,15 +470,17 @@ end
 
 function __setScroll(tag)
     local scrTwn = modchart.trackedScrollTweens[tag:gsub('out_spawnTime', '')]
-    setPropertyFromGroup('strumLineNotes', scrTwn.i, 'downScroll', scrTwn.downscroll)
+    setPropertyFromGroup('strumLineNotes', scrTwn.index, 'downScroll', scrTwn.downscroll)
     for i = 0, getProperty('notes.length')-1 do 
-        if getPropertyFromGroup('notes', i, 'isSustainNote') and getPropertyFromGroup('notes', i, 'noteData') == (scrTwn.i % 4) and getPropertyFromGroup('notes', i, 'mustPress') == (scrTwn.i > 3) then
+        if getPropertyFromGroup('notes', i, 'isSustainNote') and getPropertyFromGroup('notes', i, 'noteData') == (scrTwn.index % 4) and getPropertyFromGroup('notes', i, 'mustPress') == (scrTwn.index > 3) then
             setPropertyFromGroup('notes', i, 'flipY', scrTwn.downscroll)
         end
     end
 
+    modchart.setModifier(scrTwn.index, 'scroll', scrTwn.downscroll and modchart.ScrollType.DOWNSCROLL or modchart.ScrollType.UPSCROLL)
+
     for i = 0, getProperty('unspawnNotes.length')-1 do 
-        if getPropertyFromGroup('unspawnNotes', i, 'isSustainNote') and getPropertyFromGroup('unspawnNotes', i, 'noteData') == (scrTwn.i % 4) and getPropertyFromGroup('unspawnNotes', i, 'mustPress') == (scrTwn.i > 3) then
+        if getPropertyFromGroup('unspawnNotes', i, 'isSustainNote') and getPropertyFromGroup('unspawnNotes', i, 'noteData') == (scrTwn.index % 4) and getPropertyFromGroup('unspawnNotes', i, 'mustPress') == (scrTwn.index > 3) then
             setPropertyFromGroup('unspawnNotes', i, 'flipY', scrTwn.downscroll)
         end
     end

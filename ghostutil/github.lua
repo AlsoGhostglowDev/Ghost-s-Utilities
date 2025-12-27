@@ -65,16 +65,22 @@ end
 -- More in-depth Github tools
 
 function git.getPullRequests(user, repository)
-    local retVal = getAndParse(git.GITHUB_API_URL ..'repos/'.. user ..'/'.. repository)
-    return retVal.topics;
-end
-
-function git.getRepositoryTags(user, repository)
-    local retVal = git.getRepository();
+    local retVal = getAndParse(git.GITHUB_API_URL ..'repos/'.. user ..'/'.. repository.. '/pulls');
     return (retVal or {});
 end
 
-function git.getRepositoryCommits()
+function git.getRepositoryTags(user, repository)
+    local retVal = getAndParse(git.GITHUB_API_URL ..'repos/'.. user ..'/'.. repository.. '/tags')
+    return (retVal or {});
+end
+
+function git.getRepositoryTopics(user, repository)
+    local retVal = git.getRepository(user, repository);
+    return (retVal.topics or {});
+end
+
+
+function git.getRepositoryCommits(user, repository)
 	local retVal = getAndParse(git.GITHUB_API_URL ..'repos/'.. user ..'/'.. repository.. '/commits');
     return (retVal or {});
 end

@@ -1,6 +1,7 @@
 local cpp = {}
 
 local debug = require "ghostutil.debug"
+local util = require "ghostutil.util"
 
 local ffi = require("ffi")
 local user32 = ffi.load("user32")
@@ -187,7 +188,7 @@ function cpp.registerDPICompatible()
 	ffi.C.SetProcessDPIAware()
 end
 
-function cpp.getMoniterCount()
+function cpp.getMonitorCount()
 	return ffi.C.GetSystemMetrics(80)
 end
 
@@ -287,8 +288,18 @@ function cpp.redrawWindowHeader()
 end
 
 --  Standard C syntax functions  --
-function cpp.cast(toType, varToConvert)
-	return ffi.cast(toType, varToConvert)
+function cpp.cast(varToConvert, toType, isCType)
+	if isCType then
+		return ffi.cast(toType, varToConvert)
+	end
+
+	return ({
+		['string'] = tostring(varToConvert),
+		['number'] = tostring(varToConvert),
+		['integer'] = math.floor(tonumber(varToConvert)),
+		['boolean'] = util.toboolean(varToConvert),
+		['function'] = function() return varToConvert end
+	})[toType]
 end
 
 function cpp.alignof(var)

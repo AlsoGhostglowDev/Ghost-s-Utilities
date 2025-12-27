@@ -366,14 +366,15 @@ function reflect.createInstance(tag, className, args)
                         game.addTextToDebug("createInstance: Cannot override existing instance: ']].. tag ..[['!", 0xFFFF0000);
                     else
                         setVar(']].. tag ..[[', newInstance);
-                    return newInstance;
+                    
+                    return getVar(']].. tag ..[[') != null;
                 ]])
             end
             debugPrint('createInstance: Class "'.. className ..'" doesn\'t exist!')
         end
 
         debugPrint('createInstance: tag / className is nil / empty!')
-        return 
+        return false
     else
         return createInstance(tag, className, args)
     end
@@ -395,6 +396,7 @@ function reflect.setProperty(prop, value, allowMaps, allowInstances, forceReflec
     else
         _baseSetProperty(prop, value, allowMaps, allowInstances)
     end
+    return value
 end
 
 function reflect.setPropertyFromClass(class, prop, value, allowMaps, allowInstances) 
@@ -404,6 +406,7 @@ function reflect.setPropertyFromClass(class, prop, value, allowMaps, allowInstan
         _addLib(class)
         _baseSetProperty(prop, value, allowMaps, allowInstances, class) 
     end
+    return value
 end
 function reflect.setPropertyFromGroup(group, index, prop, value, allowMaps, allowInstances) 
     if version > '1.0' and not forceReflectFn then
@@ -414,6 +417,7 @@ function reflect.setPropertyFromGroup(group, index, prop, value, allowMaps, allo
         local _prop = (runHaxeCode('return Std.isOfType('.._parseSingleInstance(reflect.instanceArg(group, nil, true))..', Array);')) and '%s[%s]' or '%s.members[%s]'
         _baseSetProperty(_prop:format(group, index) ..'.'.. prop, value, allowMaps, allowInstances)
     end
+    return value
 end
 
 return reflect

@@ -8,6 +8,12 @@ local util = require 'ghostutil.util'
 window.defaultDimensions = {width = 1280, height = 720}
 window.desktopDimensions = {width = 0, height = 0}
 
+function gcall_window(fn, args)
+    if fn == 'onCreate' then 
+        window.init()
+    end
+end
+
 window.initialized = false
 function window.init()
     if not window.initialized then
@@ -24,6 +30,8 @@ end
 function window.setProperty(prop, value, allowMaps, allowInstances)
     window.init()
     helper.setProperty('window.'.. prop, value, allowMaps, allowInstances)
+
+    return value
 end
 
 function window.getProperty(prop, allowMaps)
@@ -49,53 +57,54 @@ end
 
 function window.resize(width, height)
     window.init()
-    window.setProperty('width', width or window.defaultDimensions.width)
-    window.setProperty('width', height or window.defaultDimensions.height)
+    window.setProperty('width', math.floor(width) or window.defaultDimensions.width)
+    window.setProperty('width', math.floor(height) or window.defaultDimensions.height)
 end
 
-function window.doTweenX(tag, value, duration, options)
+function window.doTweenX(tag, value, duration, ease)
     window.init()
     if tag ~= nil then
         options = options or {}
         options['onComplete'] = options['onComplete'] or 'onTweenCompleted'
+        duration = duration or 1
 
-        bcompat.startTween(tag, 'window', { x = value }, duration, options)
+        doTweenX(tag, 'window', value, duration, ease)
         return
     end
     debug.error('nil_param', {'tag'}, 'window.doTweenX:1')
 end
 
-function window.doTweenY(tag, value, duration, options)
+function window.doTweenY(tag, value, duration, ease)
     window.init()
     if tag ~= nil then
         options = options or {}
         options['onComplete'] = options['onComplete'] or 'onTweenCompleted'
         
-        bcompat.startTween(tag, 'window', { y = value }, duration, options)
+        doTweenY(tag, 'window', value, duration, ease)
         return
     end
     debug.error('nil_param', {'tag'}, 'window.doTweenY:1')
 end
 
-function window.doTweenPosition(tag, x, y, duration, options)
+function window.doTweenPosition(tag, x, y, duration, ease)
     window.init()
     if tag ~= nil then
         options = options or {}
         options['onComplete'] = options['onComplete'] or 'onTweenCompleted'
 
-        bcompat.startTween(tag, 'window', { x = x, y = y }, duration, options)
+        bcompat.startTween(tag, 'window', { x = x, y = y }, duration, {ease = ease})
         return
     end
     debug.error('nil_param', {'tag'}, 'window.doTweenPosition:1')
 end
 
-function window.doTweenSize(tag, width, height, duration, options)
+function window.doTweenSize(tag, width, height, duration, ease)
     window.init()
     if tag ~= nil then
         options = options or {}
         options['onComplete'] = options['onComplete'] or 'onTweenCompleted'
         
-        bcompat.startTween(tag, 'window', { width = width, height = height }, duration, options)
+        bcompat.startTween(tag, 'window', { width = math.floor(width), height = math.floor(height) }, duration, {ease = ease})
         return
     end
     debug.error('nil_param', {'tag'}, 'window.doTweenSize:1')
@@ -109,12 +118,12 @@ function window.tweenToCenter(tag, axes, duration, options)
         options = options or {}
         options['onComplete'] = options['onComplete'] or 'onTweenCompleted'
 
-        local position = {x = window.getProperty('x'), y = window.getProperty('y')}
+        local position = {}
         if axes:find('x') then 
-            position.x = (window.desktopDimensions.width - window.getProperty('width')) / 2
+            position['x'] = (window.desktopDimensions.width - window.getProperty('width')) / 2
         end
         if axes:find('y') then
-            position.y = (window.desktopDimensions.height - window.getProperty('height')) / 2
+            position['y'] = (window.desktopDimensions.height - window.getProperty('height')) / 2
         end
 
         bcompat.startTween(tag, 'window', position, duration, options)
@@ -126,18 +135,6 @@ end
 function window.startTween(tag, values, duration, options)
     window.init()
     bcompat.startTween(tag, 'window', values, duration, options)
-end
-
-function window.cancelTween(tag) 
-    cancelTween(tag) 
-end
-
-function window.pauseTween(tag)
-    helper.callMethod((version >= '1.0' and '' or 'modchartTweens.').. tag ..'.pause', {''})
-end
-
-function window.resumeTween(tag)
-    helper.callMethod((version >= '1.0' and '' or 'modchartTweens.').. tag ..'.pause', {''})
 end
 
 function window.setIcon(image)
@@ -171,32 +168,26 @@ function window.createWindow(tag, attributes)
     window.init()
     if version < '0.7' then
         if not helper.existsFromTable(window.extraWindows, tag) and not helper.variableExists(tag) then
-            attributes = attributes or {{}, {}}
-            attributes[1][1] = helper.resolveDefaultValue(attributes[1][1], 0)
-            attributes[1][2] = helper.resolveDefaultValue(attributes[1][2], 0)
-            attributes[2][1] = helper.resolveDefaultValue(attributes[2][1], 256)
-            attributes[2][2] = helper.resolveDefaultValue(attributes[2][2], 256)
-            attributes[3]    = helper.resolveDefaultValue(attributes[3], 'New Window')
-            attributes[4]    = helper.resolveDefaultValue(attributes[4], true)
-            attributes[5]    = helper.resolveDefaultValue(attributes[5], false)
-            attributes[6]    = helper.resolveDefaultValue(attributes[6], false)
-            attributes[7]    = helper.resolveDefaultValue(attributes[7], false)
-            attributes[8]    = helper.resolveDefaultValue(attributes[8], false)
-            attributes[9]    = helper.resolveDefaultValue(attributes[9], false)
+            local function fetchAttr(attribute, default)
+                if attributes[attribute] ~= nil then
+                    return tostring(attributes[attribute])
+                end
+                return tostring(default)
+            end
 
             runHaxeCode([[
                 setVar(]].. helper.serialize(tag, 'string') ..[[, FlxG.stage.application.createWindow({
-                    x: ]].. attributes[1][1] ..[[,
-                    y: ]].. attributes[1][2] ..[[,
-                    width: ]].. attributes[2][1] ..[[,
-                    height: ]].. attributes[2][2] ..[[,
-                    title: ]].. helper.serialize(attributes[3], 'string') ..[[,
-                    resizable: ]].. tostring(attributes[4]) ..[[,
-                    minimized: ]].. tostring(attributes[5]) ..[[,
-                    maximized: ]].. tostring(attributes[6]) ..[[,
-                    fullscreen: ]].. tostring(attributes[7]) ..[[,
-                    borderless: ]].. tostring(attributes[8]) ..[[,
-                    alwaysOnTop: ]].. tostring(attributes[9]) ..[[
+                    x: ]].. fetchAttr('x', 0) ..[[,
+                    y: ]].. fetchAttr('y', 0) ..[[,
+                    width: ]].. fetchAttr('width', 256) ..[[,
+                    height: ]].. fetchAttr('height', 256) ..[[,
+                    title: ]].. helper.serialize(fetchAttr('title', 'New Window'), 'string') ..[[,
+                    resizable: ]].. fetchAttr('resizable', true) ..[[,
+                    minimized: ]].. fetchAttr('minimized', false) ..[[,
+                    maximized: ]].. fetchAttr('maximized', false)  ..[[,
+                    fullscreen: ]].. fetchAttr('fullscreen', false) ..[[,
+                    borderless: ]].. fetchAttr('borderless', false) ..[[,
+                    alwaysOnTop: ]].. fetchAttr('alwaysOnTop', false) ..[[
                 }));
             ]])
 
