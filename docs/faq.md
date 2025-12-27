@@ -28,7 +28,7 @@ Here is a collection of questions that may be commonly asked when using Ghost's 
 **A:** We had issues with running `runHaxeCode` there. Psych Engine 1.0.0 and 1.0.1 also didn't have their `returnValue`. I'm too lazy to fix that for only those version.
 
 **Q: "Where can I learn about the utility?"** <br>
-**A:** Check out the [**<u>GhostUtil Wiki</u>**](), all the methods, fields from each module you require will be there!
+**A:** Check out the [**<u>GhostUtil Wiki</u>**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki), all the methods, fields from each module you require will be there!
 
 **Q: "Does this work on Linux, MacOS or even Mobile Ports?"** <br>
 **A:** I cannot give a definitive answer for mobile ports but I'm sure GhostUtil will work fine in Linux and MacOS.
@@ -38,6 +38,15 @@ Here is a collection of questions that may be commonly asked when using Ghost's 
 
 **Q: "Can I take some of the code from GhostUtil?"** <br>
 **A:** Yes, you may, credit us if you're taking a large piece of it but there's also a reason we use the MIT License, hun.
+
+**Q: "I'm interested in developing a GhostUtil extension, where can I start?"** <br>
+**A:** A template has been prepared in `ghostutil/extensions` called "`dummy.lua`". Feel free to use that to start on your project. You can also check out the [**Developing: GhostUtil Extensions**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/GhostUtil-Extensions) documentation.
+
+**Q: "Is GhostUtil 3 the last major version to be released?"** <br>
+**A:** After years in the making, yes. I am finally retiring from developing more onto this utility as Psych has became more dead ever since better alternative such as V-Slice and CodenameEngine began to gain more popularity.
+
+**Q: "What are the main changes in GhostUtil 3.0?"** <br>
+**A:** GhostUtil was changed in every aspect from the ground-up. This means v2.1h's code was completely dumped to be rebuilt into a better environment. This also made GhostUtil much easier to work with when dealing with multiple support for older Psych Engine versions. <br> The helper module was also remade to make it easier for the community to make GhostUtil extensions.
 
 ---
 

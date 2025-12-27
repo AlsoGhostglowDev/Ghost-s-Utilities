@@ -1,31 +1,31 @@
-![](assets/ghostutil-wide-wikipage-home.png)
+<img width="1200" height="100" alt="ghostutil-wide-wikipage-home" src="https://github.com/user-attachments/assets/766b0965-6204-4a25-84a0-b35c2edd71b5" />
 
 ## Welcome to GhostUtil's Wiki Homepage
 Here is the documentation on how all the functions and variables on each and every module have. <br>
 
 ## Modules:
 ### Top Level
-- [**`backwards-compat.lua`**]()
-- [**`color.lua`**]()
-- [**`cpp.lua`**]()
-- [**`debug.lua`**]()
-- [**`file.lua`**]()
-- [**`github.lua`**]()
-- [**`modchart.lua`**]()
-- [**`outdate-handler.lua`**]()
-- [**`shader.lua`**]()
-- [**`util.lua`**]()
-- [**`web.lua`**]()
-- [**`window.lua`**]()
+- [**`backwards-compat.lua`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Backwards-Compatibility)
+- [**`color.lua`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/CPP)
+- [**`cpp.lua`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Color)
+- [**`debug.lua`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Debug)
+- [**`file.lua`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/File)
+- [**`github.lua`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Github)
+- [**`modchart.lua`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Modchart)
+- [**`outdate-handler.lua`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Outdate-Handler)
+- [**`shader.lua`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Shader)
+- [**`util.lua`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Utility)
+- [**`web.lua`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Web)
+- [**`window.lua`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Window)
 
 ### Backend
-- [**`helper.lua`**]()
+- [**`helper.lua`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Helper)
 - [**`dkjson.lua`**](http://dkolf.de/dkjson-lua/documentation)
 
 ### Lua Addons
-- [**`table.lua`**]()
-- [**`string.lua`**]()
-- [**`math.lua`**]()
+- [**`table.lua`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Table)
+- [**`string.lua`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/String)
+- [**`math.lua`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Math)
 
 <br>
 
@@ -42,7 +42,7 @@ Here is the documentation on how all the functions and variables on each and eve
 ### Questions:
 
 If you have any questions, contact `ghostglowdev` *(me)* in **Discord**! <br>
-Before asking questions, make sure to check out the [**FAQ**]() for **answers on common questions**.
+Before asking questions, make sure to check out the [**FAQ**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/FAQ) for **answers on common questions**.
 
 ### Credits:
 - **GhostglowDev** (wiki structure & documentation)

@@ -110,7 +110,7 @@ Tweens a shader's float uniform value. This also works with normal sprites with 
 - `float`: The float's uniform identifier.
 - `to`: The target end value.
 - `duration` **(optional)**: Determines how long the tween will take, defaults to `1`.
-- `options` **(optional)**: The tween's options; Refer to [**`TweenOptions`**]().
+- `options` **(optional)**: The tween's options; Refer to [**`TweenOptions`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Structures#tweenoptions).
 
 <details><summary>View Example</summary>
 <p>

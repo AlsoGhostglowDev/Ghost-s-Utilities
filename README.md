@@ -38,6 +38,7 @@ GhostUtil also adds the capability to make and add **community extensions** (as 
 ## Contributors:
 * [**GhostglowDev**](https://github.com/AlsoGhostglowDev)
 * [**T-Bar**](https://github.com/TBar09)
+* [**LarryFrosty**](https://github.com/LarryFrosty)
 * [**galactic_2005**](https://github.com/galactic2005)
 * [**Meloomazy**](https://github.com/Meloomazy)
 * [**Silver984**](https://github.com/silver984)
@@ -87,7 +88,7 @@ GhostUtil also adds the capability to make and add **community extensions** (as 
 ## Information
 **a**. <u><b>Documentation</b>:</u> <br>
 GhostUtil provides an extensive documentation for every function from each respective module.<br>
-**Check it out here**: - [**`GhostUtil Docs`**]() *(Currently Unavailable)*.
+**Check it out here**: - [**`GhostUtil Docs`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki).
 
 **b**. <u><b>Issues</b>:</u> <br>
 If any errors were to occur while using GhostUtil, please check first to confirm if the error itself is **from** or **caused by** GhostUtil itself. Otherwise, the issue would be closed. <br>

@@ -188,8 +188,8 @@ Throws a GhostUtil error with the provided exception message. <br>
 *<sub>(Shortcut to <code>debug.exception(.., 'error', {..}, .., .., ..)</code>, intended for developer-only use)</sub>*
 
 **Parameters:**
-- `exception` **(one-or-another)**: Reason for the exception, refer to [**`debug.exception:1`**]().
-- `formattedText`: refer to [**`debug.exception:3`**]().
+- `exception` **(one-or-another)**: Reason for the exception, refer to **`debug.exception:1`**.
+- `formattedText`: refer to **`debug.exception:3`**.
 - `func` **(optional)**: The function name that this exception orginated from. Defaults to an empty string.
 - `forcedMsg` **(one-or-another)**: The custom exception message, if this is not `nil`, `exception` and `formattedText`'s contents will be ignored, else the formatted text is used instead. Defaults to an empty string.
 - `level`: **(optional)**: The level of the file information, fetches the top-level information by default.
@@ -222,8 +222,8 @@ Throws a GhostUtil warning with the provided exception message. <br>
 *<sub>(Shortcut to <code>debug.exception(.., 'warning', {..}, .., .., ..)</code>, intended for developer-only use)</sub>*
 
 **Parameters:**
-- `exception` **(one-or-another)**: Reason for the exception, refer to [**`debug.exception:1`**]().
-- `formattedText`: refer to [**`debug.exception:3`**]().
+- `exception` **(one-or-another)**: Reason for the exception, refer to **`debug.exception:1`**.
+- `formattedText`: refer to **`debug.exception:3`**.
 - `func` **(optional)**: The function name that this exception orginated from. Defaults to an empty string.
 - `forcedMsg` **(one-or-another)**: The custom exception message, if this is not `nil`, `exception` and `formattedText`'s contents will be ignored, else the formatted text is used instead. Defaults to an empty string.
 - `level`: **(optional)**: The level of the file information, fetches the top-level information by default.

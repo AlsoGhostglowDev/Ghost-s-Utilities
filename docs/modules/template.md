@@ -77,7 +77,7 @@ Method's description. <br>
 - `arg2`: Table containing numbers <br>
 *<sup>(additional information to the argument desc if needed)</sup>*
 - `arg3`: Dictionary containing values mapped to a key
-- `arg4`: The tween's options; Refer to [**`TweenOptions`**]().
+- `arg4`: The tween's options; Refer to [**`TweenOptions`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Structures#tweenoptions).
 - `arg5` **(optional)**: A number value, defaults to `0`
 
 <sub>Editor's note or more additional information if it's not aligned with the concurrent method's description.</sub>

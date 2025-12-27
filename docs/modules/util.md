@@ -19,9 +19,9 @@ Creates a number tween starting from `a` to `b` with the given duration and opti
 - `a`: The value the tween should start from.
 - `b`: The value the tween will end at.
 - `duration` **(optional)**: Determines how long the tween will take, defaults to `1`.
-- `options` **(optional)**: The tween's options; Refer to [**`TweenOptions`**]().
+- `options` **(optional)**: The tween's options; Refer to [**`TweenOptions`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Structures#tweenoptions).
 
-**Information:** Calls [**`onNumberTween`**]() every number update. Use this to actually get the currently tweened value.
+**Information:** Calls `onNumberTween` *(Refer to [**Callbacks**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Callbacks))* every number update. Use this to actually get the currently tweened value.
 
 <details><summary>View Example</summary>
 <p>
@@ -403,7 +403,7 @@ Fetches the position of the specified object.
 **Parameters:**
 - `object`: The object's tag.
 
-**Returns:** The object's position in [**`Point`**]().
+**Returns:** The object's position in [**`Point`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Structures#point).
 
 <details><summary>View Example</summary>
 <p>
@@ -439,7 +439,7 @@ Fetches the origin of the specified object.
 **Parameters:**
 - `object`: The object's tag.
 
-**Returns:** The object's origin in [**`Point`**]().
+**Returns:** The object's origin in [**`Point`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Structures#point).
 
 <p align="center">─────────────────────────</p>
 
@@ -463,7 +463,7 @@ Fetches the velocity of the specified object.
 **Parameters:**
 - `object`: The object's tag.
 
-**Returns:** The object's velocity in [**`Point`**]().
+**Returns:** The object's velocity in [**`Point`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Structures#point).
 
 <p align="center">─────────────────────────</p>
 

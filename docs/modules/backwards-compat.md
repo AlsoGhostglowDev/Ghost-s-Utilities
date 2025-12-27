@@ -23,7 +23,7 @@ Creates a tween of an object supporting multiple values for each respective fiel
 - `object`: The target object to tween.
 - `values`: Directory containing values mapped to their corresponding field.
 - `duration` **(optional)**: Determines how long the tween will take, defaults to `1`.
-- `options` **(optional)**: The tween's options; Refer to [**`TweenOptions`**]().
+- `options` **(optional)**: The tween's options; Refer to [**`TweenOptions`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Structures#tweenoptions).
 
 <sub>This function only uses GhostUtil's alternative way if the current Psych Engine version is under <kbd>0.7.0</kbd>.</sub>
 

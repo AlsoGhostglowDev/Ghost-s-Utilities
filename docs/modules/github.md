@@ -4,6 +4,7 @@
 ```lua
 local git = require 'ghostutil.github'
 ```
+<sup>Authored by <b>TBar</b>.</sup>
 
 ---
 

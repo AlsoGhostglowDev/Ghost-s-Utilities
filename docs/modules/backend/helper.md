@@ -55,56 +55,56 @@ Checks if the legacy version (<0.7) has Psych Engine functions available. <br>
 ```lua
 instanceArg(instance: string, ?class: string): string
 ```
-Refer to [**`bcompat.instanceArg`**]()
+Refer to [**`bcompat.instanceArg`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Backwards-Compatibility)
 
 <p align="center">─────────────────────────</p>
 
 ```lua
 callMethod(method: string, ?args: table<dynamic>): dynamic
 ```
-Refer to [**`bcompat.callMethod`**]()
+Refer to [**`bcompat.callMethod`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Backwards-Compatibility)
 
 <p align="center">─────────────────────────</p>
 
 ```lua
 callMethodFromClass(class: string, method: string, ?args: table<dynamic>): dynamic
 ```
-Refer to [**`bcompat.callMethodFromClass`**]()
+Refer to [**`bcompat.callMethodFromClass`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Backwards-Compatibility)
 
 <p align="center">─────────────────────────</p>
 
 ```lua
 createInstance(tag: string, className: string, args: table<dynamic>): boolean 
 ```
-Refer to [**`bcompat.createInstance`**]()
+Refer to [**`bcompat.createInstance`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Backwards-Compatibility)
 
 <p align="center">─────────────────────────</p>
 
 ```lua
 addInstance(instance: string, ?front: boolean): void
 ```
-Refer to [**`bcompat.addInstance`**]()
+Refer to [**`bcompat.addInstance`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Backwards-Compatibility)
 
 <p align="center">─────────────────────────</p>
 
 ```lua
 setProperty(prop: string, value: dynamic, ?allowMaps: boolean, ?allowInstances: boolean): dynamic
 ```
-Refer to [**`bcompat.setProperty`**]()
+Refer to [**`bcompat.setProperty`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Backwards-Compatibility)
 
 <p align="center">─────────────────────────</p>
 
 ```lua
 setPropertyFromClass(class: string, prop: string, value: dynamic, ?allowMaps: boolean, ?allowInstances: boolean): dynamic
 ```
-Refer to [**`bcompat.setPropertyFromClass`**]()
+Refer to [**`bcompat.setPropertyFromClass`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Backwards-Compatibility)
 
 <p align="center">─────────────────────────</p>
 
 ```lua
 setPropertyFromGroup(group: string, index: string, prop: string, value: dynamic, ?allowMaps: boolean, ?allowInstances: boolean): dynamic
 ```
-Refer to [**`bcompat.setPropertyFromGroup`**]()
+Refer to [**`bcompat.setPropertyFromGroup`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Backwards-Compatibility)
 
 <p align="center">─────────────────────────</p>
 
@@ -189,7 +189,7 @@ Fetches a map's keys. The map must be in the `variables` map or in the current P
 ```lua
 getKeys(dict: dictionary<t, dynamic>): t 
 ```
-Refer to [**`table.getkeys`**]()
+Refer to [**`table.getkeys`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Table)
 
 <p align="center">─────────────────────────</p>
 
@@ -234,35 +234,35 @@ Checks if `number` is a floating-point number.
 ```lua
 isDict(tbl: table|dictionary): boolean 
 ```
-Refer to [**`table.isdictionary`**]()
+Refer to [**`table.isdictionary`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Table)
 
 <p align="center">─────────────────────────</p>
 
 ```lua
 findIndex(tbl: table<dynamic>, el: dynamic): number
 ```
-Refer to [**`table.indexof`**]()
+Refer to [**`table.indexof`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Table)
 
 <p align="center">─────────────────────────</p>
 
 ```lua
 findKey(dict: dictionary<t, dynamic>, value: dynamic): t 
 ```
-Refer to [**`table.keyof`**]()
+Refer to [**`table.keyof`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Table)
 
 <p align="center">─────────────────────────</p>
 
 ```lua
 existsFromTable(tbl: table|dictionary, value: dynamic): boolean 
 ```
-Refer to [**`table.contains`**]()
+Refer to [**`table.contains`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Table)
 
 <p align="center">─────────────────────────</p>
 
 ```lua
 keyExists(dict: dictionary<t, dynamic>, key: t): boolean 
 ```
-Refer to [**`table.containskey`**]()
+Refer to [**`table.containskey`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Table)
 
 <p align="center">─────────────────────────</p>
 
@@ -271,7 +271,7 @@ stringSplit(str: string, del: string): string
 ```
 Similar to Psych's `stringSplit` but adds support for legacy Psych (<0.7.0) to use a custom split function before onCreate is called.
 
-**Information:** Refer to [**`string.split`**]()
+**Information:** Refer to [**`string.split`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/String)
 
 <p align="center">─────────────────────────</p>
 
@@ -296,28 +296,28 @@ A: "That 'ternary' is actually just a trick that's widely used in Lua. It can of
 ```lua
 bound(n: number, min: number, max: number): number
 ```
-Refer to [**`math.bound`**]()
+Refer to [**`math.bound`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Math)
 
 <p align="center">─────────────────────────</p>
 
 ```lua
 rawsetDict(t: dictionary, path: string, value: dynamic): void
 ```
-Refer to [**`table.rawsetdict`**]()
+Refer to [**`table.rawsetdict`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Table)
 
 <p align="center">─────────────────────────</p>
 
 ```lua
 rawgetDict(t: dictionary, path: string): dynamic
 ```
-Refer to [**`table.rawgetdict`**]()
+Refer to [**`table.rawgetdict`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Table)
 
 <p align="center">─────────────────────────</p>
 
 ```lua
 getDictLength(t: dictionary): number
 ```
-Refer to [**`table.getdictlength`**]()
+Refer to [**`table.getdictlength`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Table)
 
 <p align="center">─────────────────────────</p>
 
@@ -337,7 +337,7 @@ Packs `value` into a table `length` times.
 ```lua
 fillTable(tbl: table<dynamic>, value: dynamic, length: number): table<dynamic>
 ```
-Refer to [**`table.fill`**]()
+Refer to [**`table.fill`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Table)
 
 <p align="center">─────────────────────────</p>
 
@@ -358,21 +358,21 @@ Resolves `nil` values in `tbl`, replacing them with `fallbackValue` instead. <br
 ```lua
 resizeTable(tbl: table<dynamic>, length: number): table<dynamic>
 ```
-Refer to [**`table.resize`**]()
+Refer to [**`table.resize`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Table)
 
 <p align="center">─────────────────────────</p>
 
 ```lua
 arrayComprehension(from: number, to: number, fn: number->dynamic): table<dynamic>
 ```
-Refer to [**`table.arraycomp`**]()
+Refer to [**`table.arraycomp`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Table)
 
 <p align="center">─────────────────────────</p>
 
 ```lua
 mapComprehension(keys: table<t1>, fn: t1->t2): dictionary<t1, t2>
 ```
-Refer to [**`table.dictcomp`**]()
+Refer to [**`table.dictcomp`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Table)
 
 <p align="center">─────────────────────────</p>
 
@@ -425,21 +425,21 @@ Parses the object tag to a referenceable object in Haxe. Checks the object in th
 ```lua
 concat(t1: table, t2: table): table
 ```
-Refer to [**`table.merge`**]()
+Refer to [**`table.merge`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Table)
 
 <p align="center">─────────────────────────</p>
 
 ```lua
 concatDict(d1: dictionary, d2: dictionary, ?override: boolean): dictionary
 ```
-Refer to [**`table.mergedict`**]()
+Refer to [**`table.mergedict`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Table)
 
 <p align="center">─────────────────────────</p>
 
 ```lua
 isOfType(value: dynamic, t: string): boolean
 ```
-Refer to [**`util.isOfType`**]()
+Refer to [**`util.isOfType`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Utility)
 
 <p align="center">─────────────────────────</p>
 
@@ -508,7 +508,7 @@ Checks whether the given variable exists in the `variables` map.
 ```lua
 luaObjectExists(obj: string): boolean
 ```
-Checks whether the given object exists as a lua object. This function is redundant on Psych Engine 1.0.0 and above as all "modchart" maps has been moved to the `variables` map instead. Consider using [**`helper.variableExists`**]() instead.
+Checks whether the given object exists as a lua object. This function is redundant on Psych Engine 1.0.0 and above as all "modchart" maps has been moved to the `variables` map instead. Consider using **`helper.variableExists`** instead.
 
 **Parameters:**
 - `obj`: The object to check.

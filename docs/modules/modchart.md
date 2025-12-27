@@ -161,7 +161,7 @@ end
 ModFunctions: ModFunctions
 ```
 <sup>
-Refer to <a href='(TBA)'><b><code>ModFunctions</code></b></a>.
+Refer to <a href='https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Structures#modfunctions'><b><code>ModFunctions</code></b></a>.
 </sup>
 
 <br>
@@ -170,7 +170,7 @@ Refer to <a href='(TBA)'><b><code>ModFunctions</code></b></a>.
 ScrollType: ScrollType
 ```
 <sup>
-Refer to <a href='(TBA)'><b><code>ScrollType</code></b></a>.
+Refer to <a href='https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Structures#scrolltype'><b><code>ScrollType</code></b></a>.
 </sup>
 
 <br>
@@ -188,7 +188,7 @@ The toggle switch for the modchart manager.
 strums: table<StrumMod>
 ```
 <sup>
-Refer to <a href='(TBA)'><b><code>StrumMod</code></b></a>. <br>
+Refer to <a href='https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Structures#strummod'><b><code>StrumMod</code></b></a>. <br>
 Contains the modifiers for each strums. Indices from 1 to 4 are opponent's strums respectively and indices from 5 to 8 are the player's strums respectively. 
 </sup>
 
@@ -207,7 +207,7 @@ The global time for the modchart manager.
 defaultStrumData: table<StrumMod>
 ```
 <sup>
-Refer to <a href='(TBA)'><b><code>StrumMod</code></b></a>. <br>
+Refer to <a href='https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Structures#strummod'><b><code>StrumMod</code></b></a>. <br>
 Contains the default strum modifiers for each respective strum. 
 <b>Do not change this</b>.
 </sup>
@@ -218,7 +218,7 @@ Contains the default strum modifiers for each respective strum.
 trackedTweens: dictionary<string, ModTweenData>
 ```
 <sup>
-Refer to <a href='(TBA)'><b><code>ModTweenData</code></b></a>.
+Refer to <a href='https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Structures#modtweendata'><b><code>ModTweenData</code></b></a>.
 </sup>
 
 <br>
@@ -227,7 +227,7 @@ Refer to <a href='(TBA)'><b><code>ModTweenData</code></b></a>.
 trackedScrollTweens: dictionary<string, ModScrollTweenData>
 ```
 <sup>
-Refer to <a href='(TBA)'><b><code>ModScrollTweenData</code></b></a>.
+Refer to <a href='https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Structures#modscrolltweendata'><b><code>ModScrollTweenData</code></b></a>.
 </sup>
 
 <br>

@@ -255,7 +255,7 @@ Tweens the window to the center of the given axis. <br>
 - `axes` **(optional)**: The axis the window should center at, defaults to `'xy'` <br>
 *<sup>(can be <kbd>x</kbd>, <kbd>y</kbd> or <kbd>xy</kbd>)</sup>*
 - `duration` **(optional)**: Determines how long the tween will take, defaults to `1`.
-- `options` **(optional)**: The tween's options; Refer to [**`TweenOptions`**]().
+- `options` **(optional)**: The tween's options; Refer to [**`TweenOptions`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Structures#tweenoptions).
 
 <details><summary>View Example</summary>
 <p>
@@ -283,7 +283,7 @@ Creates a tween of the window supporting multiple values for each respective fie
 - `object`: The target object to tween.
 - `values`: Directory containing values mapped to their corresponding field.
 - `duration` **(optional)**: Determines how long the tween will take, defaults to `1`.
-- `options` **(optional)**: The tween's options; Refer to [**`TweenOptions`**]().
+- `options` **(optional)**: The tween's options; Refer to [**`TweenOptions`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Structures#tweenoptions).
 
 <sub>This tween is still cancelable through Psych's <code>cancelTween</code>.</sub>
 
@@ -327,7 +327,7 @@ window.setIcon('icon')
 alert(title: string, message: string): void
 ```
 Sends an alert to the user. <br>
-<sub>For a more advanced use, check out <a href="(TBA)"><b><code>cpp.makeMessageBox</code></b></a>.</sub>
+<sub>For a more advanced use, check out <a href="https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/CPP"><b><code>cpp.makeMessageBox</code></b></a>.</sub>
 
 **Parameters:**
 - `title`: The alert's window title.
@@ -366,7 +366,7 @@ Creates a new window for the current application. <br>
 
 **Parameters**:
 - `tag`: The tag to store to later use with other functions like `setProperty`, etc.
-- `attributes`: The window's attributes; Refer to [**`WindowAttributes`**]().
+- `attributes`: The window's attributes; Refer to [**`WindowAttributes`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Structures#windowattributes).
 
 <details><summary>View Example</summary>
 <p>

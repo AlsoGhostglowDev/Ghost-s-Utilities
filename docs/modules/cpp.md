@@ -4,6 +4,7 @@
 ```lua
 local cpp = require 'ghostutil.cpp'
 ```
+<sup>Authored by <b>TBar</b>.</sup>
 
 ---
 

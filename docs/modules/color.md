@@ -185,7 +185,7 @@ Extracts the individual color channels *(alpha, red, green, blue)* from a hexade
 **Parameters:**
 - `int`: The hexadecimal integer.
   
-**Returns:** The color channels, refer to [**`ColorChannels`**](). However, the `alpha` value will equal `0` if the given hexadecimal didn't have an alpha channel present.
+**Returns:** The color channels, refer to [**`ColorChannels`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Structures#colorchannels). However, the `alpha` value will equal `0` if the given hexadecimal didn't have an alpha channel present.
 
 <details><summary>View Example</summary>
 <p>
