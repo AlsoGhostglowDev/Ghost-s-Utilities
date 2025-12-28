@@ -1,1 +1,1 @@
-FPSCounter-openfl.display.FPS
+FPSCounter::openfl.display.FPS

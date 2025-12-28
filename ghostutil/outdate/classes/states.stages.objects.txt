@@ -1,6 +1,6 @@
 BackgroundDancer
 BackgroundGirls
-BackgroundTank-PlayState
-DadBattleFog-PlayState
-MallCrowd-PlayState
+BackgroundTank::PlayState
+DadBattleFog::PlayState
+MallCrowd::PlayState
 TankmenBG

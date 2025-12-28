@@ -1,32 +1,92 @@
----@meta file
----@author GhostglowDev
-
----@class File
 local file = {}
 
----Gets the content of a file
----@param f string The file to fetch
----@param root string The root. If it's from the mod folder. If you want to use the absolute path then use "" or "./"
----@param usingModFolder? boolean If the file is in the mod folder.
----@return string
----@nodiscard
-function file.getFileContent(f, root, usingModFolder) 
-    usingModFolder = usingModFolder or false
-    root = (root == "./" and "" or (root == nil and (usingModFolder and "mods/"..(currentModDirectory:gsub("/", ""))..root or "assets/"..root) or (usingModFolder and "mods/"..(currentModDirectory:gsub("/", "")).."/" or "assets/")))
+local helper = require 'ghostutil.backend.helper'
+local debug = require 'ghostutil.debug'
 
-    local c = ""
-    local t = assert(io.open(root..f, "r"), "File '"..root..f.."' does not exist!")
-    c = t:read("*all")
-    t:close()
-
-    return c
+local function open(filePath, mode, fn)
+    local file = assert(io.open(filePath, mode))
+    local ret = fn(file)
+    file:close()
+    return ret
 end
 
----Gets the absolute directory for the current file
----@return string
----@nodiscard
-function file.getCurrentDirectory()
-    return io.popen("cd"):read('*all')
+function file.write(filePath, content)
+    if not saveFile then
+        open(filePath, 'w', function(file)
+            file:write(content)
+        end)
+        return
+    end
+    saveFile(filePath, content, true)
+end
+
+function file.append(filePath, content)
+    if not saveFile then
+        open(filePath, 'a', function(file)
+            file:read(content)
+        end)
+        return
+    end
+    saveFile(filePath, file.read(filePath) .. content, true)
+end
+
+function file.read(filePath)
+    return open(filePath, 'r', function(file)
+        return file:read('*a')
+    end)
+end
+
+function file.exists(filePath)
+    local exists = false
+    if not checkFileExists then
+        if helper.legacyAvailable() then
+            exists = helper.callMethodFromClass('sys.FileSystem', 'exists', {filePath})
+        else
+            exists = open(filePath, 'r', function(file)
+                if not file then return false end
+                return true
+            end)
+            if not exists then
+                debug.warn('', {}, 'file.exists', 'Result might not be accurate,\nplease run this in an appropriate callback.')
+            end
+        end
+        return exists
+    end
+    return checkFileExists(filePath, true)
+end
+
+function file.isDirectory(filePath)
+    if file.exists(filePath) then
+        if helper.legacyAvailable() then
+            local isDir = helper.callMethodFromClass('sys.FileSystem', 'isDirectory', {filePath})
+            return isDir
+        end
+        debug.warn('', {}, 'file.isDirectory', 'This function is unavailable outside a function.\nPlease run this in an appropriate callback')
+    end
+    return false
+end
+
+function file.readDirectory(filePath)
+    if file.exists(filePath) then
+        if not directoryFileList then
+            if helper.legacyAvailable() then
+                local dir = helper.callMethodFromClass('sys.FileSystem', 'readDirectory', {filePath})
+                return dir
+            end
+            debug.warn('', {}, 'file.readDirectory', 'This function is unavailable outside a function.\nPlease run this in an appropriate callback')
+            return
+        end
+        return directoryFileList(filePath, true) 
+    end
+    return {}
+end
+
+function file.move(filePath, newPath)
+    filePath = filePath:gsub('\\', '/')
+    newPath = newPath:gsub('\\', '/')
+    local splPath = helper.stringSplit(filePath, '/')
+    local file = splPath[#splPath]
+    os.rename(filePath, newPath ..'/'.. file)
 end
 
 return file

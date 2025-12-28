@@ -1,4 +1,4 @@
 CutsceneHandler
 DialogueBox
 DialogueBoxPsych
-DialogueCharacter-DialogueBoxPsych
+DialogueCharacter::DialogueBoxPsych

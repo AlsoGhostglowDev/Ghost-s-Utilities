@@ -1,74 +1,122 @@
-# Ghost's Utilities
-![ghostutil2 1_noises](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/assets/159514284/27161772-75ce-474c-a5e3-85306e48e8a9)
+<img width="1200" height="300" alt="image" src="https://github.com/user-attachments/assets/eff74246-5989-4222-83e6-0429bf6cc746" />
+
+**Ghost's Utilities** *(GhostUtil for short)* is a large Lua library full of modules for all-in-one use, containing functions of which you may find useful for executing common tasks in Psych Engine. <br>
+
+### Backwards Compatibility
+<img width="1200" height="100" alt="image" src="https://github.com/user-attachments/assets/09304622-1372-48cc-bcef-243d146857fb" />
+
+GhostUtil adds support to backwards compatibility by adding newer reflect functions from **Psych Engine 1.0.0** to lower versions ranging from **0.6.3 to 0.7.3** with the **support from the <code>reflect</code> extension**. It also adds newer Psych Engine features like `startTween` and `runHaxeFunction` to **0.6.3**. <br>
+
+### Transitioning from 0.6.3 to 0.7.3
+<img width="1200" height="100" alt="image" src="https://github.com/user-attachments/assets/ccb80ee0-ddcc-42d5-8661-87c180e2c569" />
+
+The library is equipped with the `outdate-handler.lua` module of which could automatically handle the **class pathing between 0.6.3 and the 0.7.0 overhaul update**. Added support is for functions like `addHaxeLibrary`, `setPropertyFromClass` and `getPropertyFromClass`. Although, it is only limited towards the changes made in Psych Engine's Source Code and nothing from changes in other Haxelibs, like Flixel.<br>
+
+### Other Usage
+<img width="1200" height="100" alt="image" src="https://github.com/user-attachments/assets/35f7928c-f9a7-4dd6-ac00-75969dd2d0ca" />
+
+Additionally, GhostUtil has easier methods on **adding shaders to cameras** (<code>shader.addCameraFilter</code>), manipulating the **game's application** with simple tweens (<code>window.startTween</code>), and more! There's also a simple-to-use **semi-advanced modcharting tool** for you chaotic modcharters out there who uses `Lua`.<br>
+
+GhostUtil also adds the capability to make and add **community extensions** (as seen for GhostUtil's `reflect.lua` extension) for others to **integrate their own library into GhostUtil's environment**.
+
+***
+
+## Compatibility:
+
+### Tested Psych Engine Versions:
+- 0.6.3, 0.7.3 *(requires <code>reflect</code> extension)*
+- 1.0.4 <br> 
+
+*(These results are only tested from our limited unit tests, it may not be as accurate.)*
+
+### Incompatible Psych Engine Versions:
+- 0.7.1h
+- below 0.6.3
+
+***
+
+## Contributors:
+* [**GhostglowDev**](https://github.com/AlsoGhostglowDev)
+* [**T-Bar**](https://github.com/TBar09)
+* [**LarryFrosty**](https://github.com/LarryFrosty)
+* [**galactic_2005**](https://github.com/galactic2005)
+* [**Meloomazy**](https://github.com/Meloomazy)
+* [**Silver984**](https://github.com/silver984)
+* [**Flain**](https://www.youtube.com/channel/UCQ-WPpDkLX3PdKlTTtAqcsw)
+* [**El**](https://github.com/fl215)
+* [**David Kolf**](https://dkolf.de/) (dkjson)
+
+***
+
+## How to Install
+
+> [!IMPORTANT]
+> Before downloading, please check if the current Psych Engine version you're using is supported for GhostUtil usage.
+
+<b>1.</b> To use GhostUtil, drag-n-drop the `ghostutil` folder into your `PsychEngine` folder.
+<img width="1200" height="300" alt="image" src="https://github.com/user-attachments/assets/2c767e14-eebe-4a42-9f95-b4e0cfdfeb2f" />
+
+<b>2.</b> Afterwards, drag-n-drop the `callbackhandler.lua` script into `mods/scripts`.
+<img width="1200" height="300" alt="image" src="https://github.com/user-attachments/assets/0ad56355-01f8-4c60-bf54-b019feee5a2c" />
+
+<b>3.</b> Next, to actually use GhostUtil inside your scripts, simply import one of the module using the `require` function.
+> ```lua
+> -- you can name the variable to your liking.
+> -- replace "module" with the corresponding module name (e.g. util, color, modchart).
+> local gmodule = require 'ghostutil.module'
+> ```
+
+## How to Use
+
+> [!CAUTION]
+> In Psych Engine **0.6.3**, some modules may only be available after `onCreate` is called.
+
+<b>1.</b> Import one of GhostUtil's module.
+> ```lua
+> local util = require 'ghostutil.util'
+> ```
+
+<b>2.</b> Call a method from the corresponding module.
+> ```lua
+> local util = require 'ghostutil.util'
+> util.setPosition('dad', 100, 200) 
+> ```
+> *Result: `dad`'s positions is set to **(100, 200)***
+
+***
+
+## Information
+**a**. <u><b>Documentation</b>:</u> <br>
+GhostUtil provides an extensive documentation for every function from each respective module.<br>
+**Check it out here**: - [**`GhostUtil Docs`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki).
+
+**b**. <u><b>Issues</b>:</u> <br>
+If any errors were to occur while using GhostUtil, please check first to confirm if the error itself is **from** or **caused by** GhostUtil itself. Otherwise, the issue would be closed. <br>
+For a better and faster response, you should give additional information as to how the error occured or what you last did to make it throw an error.
+
+> [!WARNING]
+> Before reporting any issues to **Gamebanana / GitHub Issues / Lua Script Forum**, please do check the Wiki first for a more detailed documentation about GhostUtil's modules. 
+
+**c**. <u><b>Bug Reports</b>:</u> <br>
+If any bugs is found within the utility, make sure to report it in the Github Issue section. I would greatly appreciate if you'd provide more information to give a better response/solution towards your problem. Sorry in advanced for the inconvinience. <br>
+
+*Note that I will be closing issues that's caused in the aforementioned incompatible Psych Engine versions.*
+
+### Support Me:
+Maybe you thought my work was cool, and wanted to support me in some kind of other way? <br>
+Well now you can with **Ko-fi**! <br>
+
+[<img width="168" height="89" alt="Support Me!" src="https://github.com/user-attachments/assets/8ad30b91-00a7-48a9-99e8-b79c9abfac6b" />](https://ko-fi.com/ghostglowdev)
+
+If you ever donated or supported me, I want to say all my thanks to you guys who supports me. I genuinely can't thank you guys enough for the support you all give for my tiny projects. Thank you again :)
+
+---
+<p align="center">
+<sub><i>
+a Lua Library made by GhostglowDev; for <a href='https://github.com/ShadowMario/FNF-PsychEngine'>Psych Engine</a> <br>
+© 2025 <a href='https://github.com/AlsoGhostglowDev'>GhostglowDev</a> — <a href='https://github.com/AlsoGhostglowDev/Ghost-s-Utilities'>Ghost's Utilities</a> <br>
+Licensed under the <a href='https://opensource.org/license/mit'>MIT License</a>.
+</sub></i>
+</p>
 
 
-GhostUtil (aka. Ghost's Utilities) is a library for Psych Engine with the objective to make programming easier. It provides a unique environment for you to mess around in.
-
-## 2.0 Contributors:
-*These are the people who contributed to GhostUtil atleast once*
-* [GhostglowDev](https://github.com/AlsoGhostglowDev)
-* [T-Bar](https://github.com/TBar09)
-* [galactic_2005](https://github.com/galactic2005)
-* [Meloomazy / Laztrix](https://github.com/Meloomazy)
-* [Apollo](https://github.com/apollooo7)
-* [Flain](https://www.youtube.com/channel/UCQ-WPpDkLX3PdKlTTtAqcsw)
-* [Execute](https://github.com/fl215)
-
-## Other Recommended Library:
-* [PEModUtils](https://github.com/galactic2005/PEModUtils) by galactic_2005
-
-## The Basics
-
-### How do I use GhostUtil?
-* Add the "ghostutil" folder to the main Psych Engine folder (where the `.exe` is).
-
-![image](https://github.com/GhostglowDev/Ghost-s-Utilities/assets/108509756/076a2654-46fd-4231-b4ba-2512f4ee880c)
-
-* Next, drag-n-drop the `callbackhandler.lua` file to `mods/scripts`.
-
-![image](https://github.com/GhostglowDev/Ghost-s-Utilities/assets/108509756/cf993438-85c4-447c-9cb0-0255ebf7a765)
-
-* To use GhostUtil, you must import it's modules; you must use the `require` function.
-                   
-```lua
-local string = require 'ghostutil.lua-addons.string'
-local math = require 'ghostutil.lua-addons.math'
-local game = require 'ghostutil.game'
-local outdate = require 'ghostutil.outdate-handler' 
-```
-
-* Now you can mess around in the GhostUtil environment!
-```lua
-local math = require "ghostutil.lua-addons.math"
-local game = require "ghostutil.game"
-
-function onCreate()
-    luaDebugMode = true
-    game.doTweenScale("tweenScale", "boyfriend", {2, 2.1}, "expoOut")
-    game.doTweenPosition({"boyfriendcool", "boyfriendswag"}, "boyfriend", {
-        game.getPosition("boyfriend").x - 100,
-        math.boundto(game.getPosition("dad").y + 100, -100, 200)
-    }, 2, "expoOut")
-end
-```
-
-### For more advanced information:
-**CHECK OUT THE [WIKI](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki) FOR MORE FUNCTIONS.**
-
-### Older Versions
-**Psych Engine**:
-
-* below 0.6.3:
-Some of the functions GhostUtil utilizes don't exist.
-
- * 0.7.1h:
-It breaks GhostUtil (mostly because of `runHaxeCode`);
-
-**GhostUtil**:
-
-* below 2.0.0a:
-When using the `Window` class, add `window.init()` before doing anything with the Window class.
-
-
-* below 1.0.0:
-Naming the variable `math` will break the script.

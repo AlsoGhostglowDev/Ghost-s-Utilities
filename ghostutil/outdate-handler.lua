@@ -1,131 +1,71 @@
----@meta outdate-handler
----@author GhostglowDev, galactic_2005, Laztrix
-
----Thanks to galactic_2005 for letting me use his idea from PEModUtils
----@class apicompatible
 local outdate = {}
 
-local f = require "ghostutil.file"
-local d = require "ghostutil.debug"
-
--- thanks to laztrix for optimizing these.. there were literally like a hundred f.getFileContent i swear
--- - ghost
-local classFiles = {
-    "backend", "cutscenes", "debug", "flixel.addons.ui", "objects",
-    "psychlua", "states.editors", "states.stages.objects", "states",
-    "shaders", "substates", "unused"
-}
+local helper = require 'ghostutil.backend.helper'
+local debug = require 'ghostutil.debug'
+local file = require 'ghostutil.file'
 
 outdate.classes = {}
+local packages = { 
+    'backend', 'cutscenes', 'debug',
+    'flixel.addons.ui', 'objects', 'psychlua',
+    'shaders', 'states.editors', 'states.stages.objects',
+    'states', 'substates', 'unused' 
+}
 
-for _, className in ipairs(classFiles) do
-    local path = string.format("ghostutil/outdate/classes/%s.txt", className)
-    outdate.classes[className] = f.getFileContent(path, "./")
+for i, package in ipairs(packages) do
+    local classes = helper.stringSplit(file.read('ghostutil/outdate/classes/'.. package ..'.txt'), '\n')
+    for i, class in ipairs(classes) do
+        local actualClass = helper.stringSplit(class, '::')[1]
+        outdate.classes[actualClass] = {package, class}
+    end
 end
 
----Returns the class (with the packages) based on said version 
----@param zeroSeven boolean Above 0.7.0? 
----@param class string The class. The package shouldn't be added
----@param doErr boolean Should it print an error on fail?
----@return string
-function outdate.classBasedOnVersion(zeroSeven, className, doErr)
-    if doErr == nil then doErr = true end
-    if zeroSeven == nil or zeroSeven == "" then if doErr then d.error("outdate.classBasedOnVersion: ZeroSeven is ".. (zeroSeven == nil and "nil" or "empty")) end return "fail" end
-    if className == nil or className == "" then if doErr then d.error("outdate.classBasedOnVersion: Class is ".. (className == nil and "nil" or "empty")) end return "fail" end
+function outdate.resolveClass(class, legacy, psychExclusive, avoidWarn)
+    legacy = helper.resolveDefaultValue(legacy, version < '0.7')
+    psychExclusive = helper.resolveDefaultValue(psychExclusive, true)
+    avoidWarn = helper.resolveDefaultValue(avoidWarn, true)
 
-    local debugMode = false
-    if debugMode then 
-        debugPrint([[
-            outdate.classBasedOnVersion, Arguments:
-            [
-                zeroSeven:Bool = ]].. tostring(zeroSeven) ..[[,
-                className:String = ']].. className ..[[',
-                ?doErr:Bool = ]].. tostring(doErr) ..[[
-
-            ]
-        ]]) 
-    end
-
-    if className == "Main" or className == "import" then return className else
-        for lib, classes in pairs(outdate.classes) do
-            classes = stringSplit(classes, "\n") -- making it an actual table
-            for _, class in ipairs(classes) do -- iterates over all of the classes
-                if className == (string.find(class, "-") and stringSplit(class, "-")[1] or class) then -- checks if the current class is the target class
-                    if debugMode then 
-                        debugPrint("CLASS FOUND!: ".. class ..", FROM LIBRARY: ".. lib .." ... FINDING CLASS BASED ON VERSION ".. (zeroSeven and "0.7" or "BELOW 0.7") .."...")
-                        debugPrint("RESULT FOR CLASS FOR VERSION ".. (zeroSeven and "0.7" or "BELOW 0.7") .. ": " ..
-                        (zeroSeven and 
-                            lib .. "." .. (string.find(class, "-") and stringSplit(class, "-")[1] or class) -- for 0.7.x
-                        or 
-                            (string.find(class, "-") and stringSplit(class, "-")[2] or class) -- for below 0.7
-                        ) .. " // ORIGINAL className INPUTTED: ".. className) 
-                    end
-
-                    return (
-                        zeroSeven and 
-                            lib .. "." .. (string.find(class, "-") and stringSplit(class, "-")[1] or class) -- for 0.7.x
-                        or 
-                            (string.find(class, "-") and stringSplit(class, "-")[2] or class) -- for below 0.7
-                    )
-                end
-            end
+    local splClass = helper.stringSplit(class, '.')
+    local classToResolve = splClass[#splClass]
+    local package = table.concat(helper.resizeTable(splClass, #splClass-1), '.') -- unused
+    if helper.eqAny(classToResolve, {'Main', 'import'}) then return class else
+        if helper.keyExists(outdate.classes, classToResolve) then
+            local info = outdate.classes[classToResolve]
+            local package, class = info[1], info[2]
+            local leClass = helper.stringSplit(class, '::')
+            return legacy and (leClass[2] or leClass[1]) or (package ..'.'.. leClass[1]) 
         end
-    end
-
-    if doErr then
-        d.error("outdate.returnBasedOnVersion: Failed to return class '".. className .."'")
-    end
-    return "fail"
-end
-
----`addHaxeLibrary` that adds the library based on the current version (Psych Engine's libraries only)
----@param libName string The library name (without the package)
-function outdate.addHaxeLibrary(libName)
-    if libName == "" and libName == nil then
-        d.error("outdate:addHaxeLibrary:1: The argument 'libName' is " .. (libName == "" and "empty" or "nil") .. "!")
-        return
-    end
-
-    local actualLib = outdate.classBasedOnVersion(version >= "0.7.0", libName, false)
-    local funkinClass = (actualLib ~= "fail")
-    if funkinClass then 
-        local libs = stringSplit(actualLib, ".")
-        local class = (#libs >= 1 and libs[#libs] or actualLib)
-        local package = ""
-        if #libs >= 1 then
-            table.remove(libs, (#libs))
-            if #libs >= 2 then
-                for i, lib in ipairs(libs) do
-                    package = package .. lib .. (i == #libs and "" or ".")
-                end
-            elseif #libs == 1 then
-                package = libs[1]
-            end
+        if psychExclusive then
+            debug.error('unrecog_el', {class, 'outdate.classes,\nare you sure it\'s a class from Psych Engine?'}, 'outdate.resolveClass:1')
+            return nil
         end
-
-        addHaxeLibrary(class, package)
-        return
+        if luaDebugMode and not avoidWarn then
+            debug.warn('unrecog_el', {class, 'outdate.classes,\nReturning "'.. class ..'" back, this could be because it\'s not from Psych Engine'})
+        end
+        return class
     end
-    d.error("outdate:addHaxeLibrary:1: The library is not from Psych Engine source code!")
 end
 
----Fetches a variable from a class
----@param classVar string
----@param variable string
----@param allowMaps boolean
----@return any
----@nodiscard
-function outdate.getPropertyFromClass(classVar, variable, allowMaps)
-    return getPropertyFromClass(outdate.classBasedOnVersion(version >= "0.7.0", classVar), variable, allowMaps or false)
+function outdate.addHaxeLibrary(libName, pkg, legacy, shouldWarn)
+    helper.resolveDefaultValue(legacy, version < '0.7')
+    helper.resolveDefaultValue(shouldWarn, false)
+    pkg = (pkg == nil) and '' or pkg .. '.'
+    local splClass = helper.stringSplit(outdate.resolveClass(pkg .. libName, legacy, false, not shouldWarn), '.')
+    local class = splClass[#splClass]
+    local package = table.concat(helper.resizeTable(splClass, #splClass-1), '.')
+
+    debugPrint('added library: Class: '.. class .. ' | Package: '.. package)
+    helper.addHaxeLibrary(class, package)
 end
 
----Sets a the variable's value from a class
----@param classVar string
----@param variable string
----@param value any
----@param allowMaps boolean
-function outdate.setPropertyFromClass(classVar, variable, value, allowMaps)
-    setPropertyFromClass(outdate.classBasedOnVersion(version >= "0.7.0", classVar), variable, value, allowMaps or false)
+function outdate.setPropertyFromClass(class, prop, value, allowMaps, allowInstances, legacy)
+    helper.resolveDefaultValue(legacy, version < '0.7')
+    helper.setPropertyFromClass(outdate.resolveClass(class, legacy, false, true), prop, value, allowMaps, allowInstances)
+end
+
+function outdate.getPropertyFromClass(class, prop, allowMaps, legacy)
+    helper.resolveDefaultValue(legacy, version < '0.7')
+    helper.getPropertyFromClass(outdate.resolveClass(class, legacy, false, true), prop, allowMaps)
 end
 
 return outdate

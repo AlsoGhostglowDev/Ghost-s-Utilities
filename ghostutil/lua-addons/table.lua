@@ -1,57 +1,71 @@
----@meta table
+local helper = require 'ghostutil.backend.helper'
 
----@class tablelib
-local tbl = setmetatable({}, {
-    __index = table,
-})
+table.isdictionary = helper.isDict
+table.isdict = table.isdictionary
+table.getkeys = helper.getKeys
+table.keys = table.getkeys
+table.indexof = helper.findIndex
+table.keyof = helper.findKey
+table.contains = helper.existsFromTable
+table.exists = table.contains
+table.has = table.contains
+table.hasvalue = table.contains
+table.containskey = helper.keyExists
+table.keyexists = table.containskey
+table.haskey = table.containskey
+table.rawsetdict = helper.rawsetDict
+table.rawgetdict = helper.rawgetDict
+table.getdictlength = helper.getDictLength
+table.getdictlen = table.getdictlength
+table.fill = helper.fillTable
+table.resize = helper.resizeTable
+table.arraycomp = helper.arrayComprehension
+table.dictcomp = helper.mapComprehension
+table.merge = helper.concat
+table.mergedict = helper.concatDict
 
-local d = require "ghostutil.Debug"
-
----Finds the pos of a certain value in a table. If fails, returns -1
----@param self table
----@param val any Value to find 
----@return integer
-function tbl.indexOf(self, val)
-    if type(self) ~= "table" then
-        d.error("table.indexOf:1: Expected table, got ".. type(self) .." instead.")
-        return -1
+function table.filter(t, filter)
+    local ret = {}
+    for k, v in pairs(t) do 
+        if filter(k, v) then 
+            ret[k] = v
+        end
     end
-
-    local i = 1
-    for _, v in pairs(self) do
-        if v == val then return i end
-        i = i + 1
-    end
-
-    d.error("table.indexOf: Couldn't find the pos from table's values!")
-    return -1
-end
-
----Checks if certain value in the table exists. If fails, returns false
----@param self table 
----@param val any Value to check
----@return boolean
-function tbl.exists(self, val)
-    if type(self) ~= "table" then
-        d.error("table.findpos:1: Expected table, got ".. type(self) .." instead.")
-        return false
-    end
-
-    for i = 1, #self do
-        if self[i] == val then return true end
-    end
-
-    return false
-end
-
----Concatenates tables
----@vararg table Tables to concatenate
-function tbl.concat(...)
-    local ret, arg = {}, table.pack(...)
-    for _, t in ipairs(arg) do for _, v in ipairs(t) do
-            table.insert(ret, v)  
-    end end
     return ret
 end
 
-return tbl
+function table.pop(t)
+    if #t > 0 then
+        local lastEl = t[#t]
+        table.remove(t, #t)
+        return lastEl
+    end
+    return nil
+end
+
+function table.shift(t)
+    if #t > 0 then
+        local firstEl = t[1]
+        table.remove(t, 1)
+        return firstEl
+    end
+    return nil
+end
+
+function table.reverse(t)
+    for i = 1, math.floor(#t) do
+        t[i], t[n - i + 1] = t[n - i + 1], t[i]
+    end
+    return t
+end
+
+function table.clone(t)
+    local ret = {}
+    for k, v in pairs(tbl) do
+        ret[k] = type(v) == 'table' and table.clone(v) or v
+    end
+    return ret
+end
+table.copy = table.clone
+
+return table

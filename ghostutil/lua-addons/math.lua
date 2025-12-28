@@ -1,98 +1,126 @@
----@meta math
----@author GhostglowDev, Execute
+local util = require 'ghostutil.util'
 
----@class mathlib
-local mt = setmetatable({}, {
-    __index = math,
-})
+--[=[
+    ########################
+        LUA ADDON - MATH
+    ########################
+]=]
 
-local d = require "ghostutil.Debug"
+math.epsilon = 1e-12
+math.max_float = 1.79e308
+math.max_int = 0x7FFFFFFF
+math.min_float = 4.94e-324
+math.min_int = -0x7FFFFFFF
 
----Used to account for floating-point inaccuracies.
-mt.epsilon = 0.0000001
----Maximum value of an integer
-mt.max_int = 0x7FFFFFFF
----Minimum value of an integer
-mt.min_int = -mt.max_int
+math.infinity = math.huge
+math.negative_infinity = -math.huge
+math.nan = 0/0
 
----Maximum value of a floating number
-mt.max_float = 1.79e+308
----Minimum value of a floating number
-mt.min_float = 0.0000000001
-
----Imaginary number, i
-mt.imaginary = mt.sqrt(-1)
-
----Infinity
-mt.infinity = mt.huge
----Negative Infnity
-mt.negative_infinity = -mt.infinity
-
----Linear Interpolation
----@param a number Point A
----@param b number Point B
----@param r number Ratio
----@return number
-mt.lerp = function(a, b, r)
-    return a + (r * (60 / getPropertyFromClass("Main", "fpsVar.currentFPS"))) * (b - a)
+function math.lerp(a, b, ratio)
+    ratio = math.bound(ratio, 0, 1)
+    return a + (ratio * (b - a))
 end
 
----Positive to Negative and Negative to Positive.
----@param self number Value
----@return number
-mt.invert = function(self)
-    return self * -1
+function math.fpslerp(a, b, ratio)
+    ratio = math.bound(ratio, 0, 1)
+    return a + (ratio * (60 / util.getFps())) * (b - a)
 end
 
----Checks if the given number is a positive number (0 is not positive nor negative so it will return false.)
----@param self number Value
----@return boolean
-mt.ispositive = function(self)
-    return (self > 0)
+function math.isfinite(n)
+    return (n ~= math.infinity
+            and n ~= math.negative_infinity
+            and n ~= math.nan)
 end
 
----Checks if the given number is a negative number (0 is not positive nor negative so it will return false.)
----@param self number Value
----@return boolean
-mt.isnegative = function(self)
-    return (self < 0)
+function math.isnan(n)
+    return util.isnan(n)
 end
 
----Factorial of a number (Integers only)
----@param self number To be factored
----@return integer
----@author Execute
-mt.fact = function(self)
-    return self <= 1 and 1 or (self * mt.fact(self-1))
+function math.invert(n)
+    return -n
 end
 
----Bound a number by a minimum and maximum. Ensures that this number is no smaller than the minimum, and no larger than the maximum
----@param self number Value
----@param mx number Maximum
----@param mn number Minimum
----@return number
-mt.boundto = function(self, mx, mn)
-    return mt.max(mn, mt.min(mx, self))
+function math.ispositive(n)
+    return n > 0
 end
 
----Limits the amount of decimals
----@param self number Number
----@param dc number Target amount of decimals (Optional, default = 2)
----@return number
-mt.floordecimal = function(self, dc)
-    return tonumber(string.format('%.'..(dc or 2)..'f', self))
+function math.isnegative(n)
+    return n < 0
 end
 
-mt.round = function(self)
-    return math.floor(self+0.5)
+function math.factorial(n)
+    n = math.floor(n)
+    return n <= 1 and 1 or (n * math.factorial(n - 1))
 end
 
----Returns the midpoint of a certain distance
----@param x number Point 1
----@param y number Point 2
----@return number
-mt.getmidpoint = function(x, y)
-    return (x + y) / 2
+function math.bound(n, min, max)
+    return math.max(math.min(n, min), max)
+end
+math.clamp = math.bound
+
+function math.floordecimal(n, decimals)
+    return tonumber(string.format('%.'.. (decimals or 2) ..'f', n))
 end
 
-return mt
+function math.round(n)
+    return math.floor(n + 0.5)
+end
+
+function math.midpoint(a, b)
+    return (a + b) / 2
+end
+
+function math.distance(x1, y1, x2, y2)
+    return math.sqrt((x2 - x1)^2 + (y2 - y1)^2)
+end
+
+function math.distance3(x1, y1, z1, x2, y2, z2)
+    return math.sqrt((x2 - x1)^2 + (y2 - y1)^2 + (z2 - z1)^2)
+end
+
+function math.dot(ax, ay, bx, by)
+    return ax * bx + ay * by
+end
+
+function math.dot3(ax, ay, az, bx, by, bz)
+    return ax * bx + ay * by + az * bz
+end
+
+function math.equals(a, b, diff)
+    diff = diff or math.epsilon
+    return math.abs(a - b) <= diff
+end
+
+function math.area(w, h)
+    return w * h
+end
+
+function math.volume(w, h, l)
+    return w * h * l
+end
+
+function math.inbounds(n, min, max)
+    return n >= min and n <= max 
+end
+
+function math.iseven(n)
+    return n % 2 == 0
+end
+
+function math.isodd(n)
+    return n % 2 ~= 0
+end
+
+function math.boundedadd(n, a, min, max)
+    return math.bound(n + a, min, max)
+end
+
+function math.samesign(a, b)
+    return math.signof(a) == math.signof(b)
+end
+
+function math.signof(n)
+    return n < 0 and -1 or 1
+end
+
+return math

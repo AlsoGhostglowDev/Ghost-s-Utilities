@@ -4,14 +4,14 @@ Conductor
 Controls
 CoolUtil
 CustomFadeTransition
-Difficulty-CoolUtil
+Difficulty::CoolUtil
 Discord
 Highscore
 InputFormatter
 MusicBeatState
 MusicBeatSubstate
 Paths
-Rating-Conductor
+Rating::Conductor
 Section
 Song
 StageData
