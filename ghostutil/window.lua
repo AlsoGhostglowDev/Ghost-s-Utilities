@@ -9,7 +9,7 @@ window.defaultDimensions = {width = 1280, height = 720}
 window.desktopDimensions = {width = 0, height = 0}
 
 function gcall_window(fn, args)
-    if fn == 'onCreate' then 
+    if fn == 'onStartCountdown' then 
         window.init()
     end
 end
@@ -46,7 +46,8 @@ end
 
 function window.screenCenter(axes)
     window.init()
-    axes = axes:lower() or 'xy'
+    axes = axes or 'xy'
+    axes = axes:lower()
     if axes:find('x') then 
         window.setProperty('x', (window.desktopDimensions.width - window.getProperty('width')) / 2)
     end
@@ -58,7 +59,7 @@ end
 function window.resize(width, height)
     window.init()
     window.setProperty('width', math.floor(width) or window.defaultDimensions.width)
-    window.setProperty('width', math.floor(height) or window.defaultDimensions.height)
+    window.setProperty('height', math.floor(height) or window.defaultDimensions.height)
 end
 
 function window.doTweenX(tag, value, duration, ease)

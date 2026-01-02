@@ -64,7 +64,7 @@ function shader.addCameraFilter(camera, filter, floats, tag)
         helper.createInstance(tag ..'_filter', 'openfl.filters.ShaderFilter', {helper.instanceArg(tag ..'.shader')})
         helper.callMethod(camera .. filtersField ..'.push', { helper.instanceArg(tag ..'_filter') })
 
-        if floats ~= nil and #floats > 0 then
+        if floats ~= nil and helper.getDictLength(floats) > 0 then
             for uniform, value in pairs(floats) do
                 local setShaderFn = type(value) == 'table' and setShaderFloatArray or setShaderFloat
                 setShaderFn(tag, uniform, value)
@@ -111,6 +111,13 @@ function shader.tweenShaderFloat(tweenTag, tag, float, to, duration, options)
         local _options = bcompat.__buildOptions(tweenTag, tag, options)
         local tweenPre = bcompat.__getTweenPrefix()
 
+        setShaderFloat(tag, float, 
+            runHaxeCode(('try { return %s.shader.getFloat(%s); } catch(e:Dynamic) {} return 0;'):format(
+                helper.parseObject(tag), 
+                helper.serialize(float, 'string')
+            ))
+        ) -- avoid null obj ref
+        
         cancelTween(tweenTag) -- existing tween can kill itself
         runHaxeCode(([[
             var object = %s;
