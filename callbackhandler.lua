@@ -61,11 +61,12 @@ for _, _c in ipairs(callbacks) do
     local c, pc, hasPost, hasPre = _c[1], _c[2] or 0, (_c[3] == nil and false or _c[3]), (_c[4] == nil and false or _c[4])
     for i = 1, ((hasPost or hasPre) and 2 or 1) do
         local c = c ..(i == 2 and (hasPost and 'Post' or 'Pre') or '')
-        call = call .. [[
+        call = call .. (c == 'onCreate' and [[
+            ]].. getCalls(c, arg(pc)) or [[
             function ]].. c ..[[(]].. arg(pc) ..[[)
                 ]].. getCalls(c, arg(pc)) ..[[
             end
-        ]]
+        ]])
     end
 end
 
