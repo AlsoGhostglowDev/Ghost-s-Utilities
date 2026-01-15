@@ -65,7 +65,7 @@ end
 
 function outdate.getPropertyFromClass(class, prop, allowMaps, legacy)
     helper.resolveDefaultValue(legacy, version < '0.7')
-    helper.getPropertyFromClass(outdate.resolveClass(class, legacy, false, true), prop, allowMaps)
+    return getPropertyFromClass(outdate.resolveClass(class, legacy, false, true), prop, allowMaps)
 end
 
 return outdate
