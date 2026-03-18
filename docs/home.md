@@ -6,8 +6,8 @@ Here is the documentation on how all the functions and variables on each and eve
 ## Modules:
 ### Top Level
 - [**`backwards-compat.lua`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Backwards-Compatibility)
-- [**`color.lua`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/CPP)
-- [**`cpp.lua`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Color)
+- [**`color.lua`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Color)
+- [**`cpp.lua`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/CPP)
 - [**`debug.lua`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Debug)
 - [**`file.lua`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/File)
 - [**`github.lua`**](https://github.com/AlsoGhostglowDev/Ghost-s-Utilities/wiki/Github)
